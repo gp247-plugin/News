@@ -33,9 +33,18 @@
     // End add layout page for news
 
     // Register this plugin's active categories/content into sitemap.xml
-    // (US-PLG-007, ADR seo_plugin-sitemap-extension). SeoController reads
-    // this registry — gp247/front never hardcodes the News plugin's name.
+    // (US-PLG-007, ADR seo_plugin-sitemap-extension, amended 20260711T135121).
+    // SeoController reads this registry — gp247/front never hardcodes the
+    // News plugin's name. 'key' also lets the admin toggle this plugin's
+    // whole sitemap contribution off from the "SEO" admin screen
+    // (seo.plugin_enabled.News); 'label' is what that screen displays,
+    // reusing the manifest's own "name" field so no new translation key
+    // is needed just for this.
     $sitemapProviders = config('gp247-config.front.seo_sitemap_providers', []);
-    $sitemapProviders[] = [\App\GP247\Plugins\News\Seo::class, 'sitemapUrls'];
+    $sitemapProviders[] = [
+        'key' => $config['configKey'],
+        'label' => $config['name'],
+        'callback' => [\App\GP247\Plugins\News\Seo::class, 'sitemapUrls'],
+    ];
     config(['gp247-config.front.seo_sitemap_providers' => $sitemapProviders]);
  }
