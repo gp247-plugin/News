@@ -24,19 +24,6 @@
      view()->share('modelNewsCategory', (new \App\GP247\Plugins\News\Models\NewsCategory));
      view()->share('modelNewsContent', (new \App\GP247\Plugins\News\Models\NewsContent));
 
-     \Illuminate\Support\Facades\Validator::extend('news_category_alias_unique', function ($attribute, $value, $parameters, $validator) {
-        $objectId = $parameters[0] ?? '';
-        return (new \App\GP247\Plugins\News\Models\NewsCategory)
-        ->checkAliasValidationAdmin('alias', $value, $objectId, session('adminStoreId'));
-    });
-
-    \Illuminate\Support\Facades\Validator::extend('news_content_alias_unique', function ($attribute, $value, $parameters, $validator) {
-        $objectId = $parameters[0] ?? '';
-        return (new \App\GP247\Plugins\News\Models\NewsContent)
-        ->checkAliasValidationAdmin('alias', $value, $objectId, session('adminStoreId'));
-    });
-
-    
     // Add layout page for news
     $configLayout = config('gp247-config.front.layout_page', []);
     $configLayout['news_index'] = gp247_language_render($extensionPath.'::News.layout_block_page.news_index')   ;

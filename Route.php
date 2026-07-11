@@ -1,5 +1,7 @@
 <?php
 use Illuminate\Support\Facades\Route;
+use App\GP247\Plugins\News\Admin\Livewire\NewsCategoryManager;
+use App\GP247\Plugins\News\Admin\Livewire\NewsContentManager;
 
 $config = file_get_contents(__DIR__.'/gp247.json');
 $config = json_decode($config, true);
@@ -25,41 +27,26 @@ if(gp247_extension_check_active($config['configGroup'], $config['configKey'])) {
         }
     );
 
+    // v2 (Livewire + TailAdmin) — replaces the legacy AdminLTE controllers.
+    // Route names kept identical to v1 for back-compat: existing sites already
+    // have AdminMenu rows referencing `route_admin::admin_news_category.index`
+    // and `route_admin::admin_news_content.index` (see ExtensionModel::installExtension()).
     Route::group(
         [
             'prefix' => GP247_ADMIN_PREFIX,
             'middleware' => GP247_ADMIN_MIDDLEWARE,
-            'namespace' => '\App\GP247\Plugins\News\Admin',
-        ], 
+        ],
         function () {
             Route::group(['prefix' => 'news_category'], function () {
-                Route::get('/', 'NewsCategoryController@index')
-                    ->name('admin_news_category.index');
-                Route::get('create', 'NewsCategoryController@create')
-                    ->name('admin_news_category.create');
-                Route::post('/create', 'NewsCategoryController@postCreate')
-                    ->name('admin_news_category.create');
-                Route::get('/edit/{id}', 'NewsCategoryController@edit')
-                    ->name('admin_news_category.edit');
-                Route::post('/edit/{id}', 'NewsCategoryController@postEdit')
-                    ->name('admin_news_category.edit');
-                Route::post('/delete', 'NewsCategoryController@deleteList')
-                    ->name('admin_news_category.delete');
+                Route::get('/', NewsCategoryManager::class)->name('admin_news_category.index');
+                Route::get('/create', NewsCategoryManager::class)->name('admin_news_category.create');
+                Route::get('/edit/{id}', NewsCategoryManager::class)->name('admin_news_category.edit');
             });
-    
+
             Route::group(['prefix' => 'news_content'], function () {
-                Route::get('/', 'NewsContentController@index')
-                    ->name('admin_news_content.index');
-                Route::get('create', 'NewsContentController@create')
-                    ->name('admin_news_content.create');
-                Route::post('/create', 'NewsContentController@postCreate')
-                    ->name('admin_news_content.create');
-                Route::get('/edit/{id}', 'NewsContentController@edit')
-                    ->name('admin_news_content.edit');
-                Route::post('/edit/{id}', 'NewsContentController@postEdit')
-                    ->name('admin_news_content.edit');
-                Route::post('/delete', 'NewsContentController@deleteList')
-                    ->name('admin_news_content.delete');
+                Route::get('/', NewsContentManager::class)->name('admin_news_content.index');
+                Route::get('/create', NewsContentManager::class)->name('admin_news_content.create');
+                Route::get('/edit/{id}', NewsContentManager::class)->name('admin_news_content.edit');
             });
         }
     );

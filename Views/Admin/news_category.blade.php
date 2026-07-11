@@ -1,250 +1,129 @@
-@extends('gp247-core::layout')
+{{--
+    News category manager — v2 port (Livewire + TailAdmin, two-panel: add/edit
+    form left, list right, on the core ResourcePanel base + multilingual trait).
+    Replaces the legacy AdminLTE view (which extended the now-deleted
+    `gp247-core::layout`). UI text via gp247_language_render.
 
-@section('main')
-<div class="row">
-    <div class="col-md-12">
-        <div class="card">
-            <div class="card-header with-border">
-                <h2 class="card-title">{{ $title_description??'' }}</h2>
+    @aidlc-unit plugin-news
+    @aidlc-story GP247-v2-compat
 
-                <div class="card-tools">
-                    <div class="btn-group float-right mr-5">
-                        <a href="{{ gp247_route_admin('admin_news_category.index') }}" class="btn  btn-flat btn-default" title="List"><i
-                                class="fa fa-list"></i><span class="hidden-xs"> {{gp247_language_render('admin.back_list')}}</span></a>
-                    </div>
+    Variables: $rows (NewsCategory paginator); $form, $desc, $editingId, $sortField, $sortDir (state).
+--}}
+@php($inputCls = 'w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100')
+@php($labelCls = 'mb-2 block text-sm font-medium text-gray-700 dark:text-gray-200')
+
+<div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
+
+    {{-- Left: add / edit form --}}
+    <x-gp247::card :title="gp247_language_render($editingId ? 'action.edit' : 'Plugins/News::Category.admin.add_news_title')">
+        <form wire:submit="save" class="space-y-4">
+
+            @php($tabsMap = [
+                'general' => gp247_language_render('admin.product.tab_general'),
+                'desc'    => gp247_language_render('admin.product.tab_description'),
+            ])
+            {{-- Surface validation errors on hidden tabs --}}
+            @php($tabsWithErrors = array_values(array_intersect(
+                array_keys($tabsMap),
+                array_unique(array_map(
+                    static fn ($k) => (str_starts_with($k, 'desc.') || $k === 'form.alias') ? 'desc' : 'general',
+                    $errors->keys()
+                ))
+            )))
+            <x-gp247::tabs :tabs="$tabsMap" :errors="$tabsWithErrors" default="general">
+
+                {{-- ---- General ---- --}}
+                <div x-show="tab === 'general'" class="space-y-4">
+                    <x-gp247::searchable-select
+                        model="form.parent"
+                        :label="gp247_language_render('Plugins/News::Category.admin.select_parent')"
+                        :options="collect(['' => '== ROOT =='] + $this->parentOptions())->reject(fn ($title, $id) => $id !== '' && (string) $id === (string) $editingId)->map(fn ($title, $id) => ['id' => (string) $id, 'label' => $title])->values()->all()"
+                    />
+
+                    <x-gp247::media-input :label="gp247_language_render('Plugins/News::Category.image')" name="image" type="category"
+                        wire:model="form.image" :value="$form['image'] ?? ''" :error="$errors->first('form.image')" />
+
+                    <x-gp247::input type="number" min="0" :label="gp247_language_render('Plugins/News::Category.sort')"
+                        name="sort" wire:model="form.sort" :error="$errors->first('form.sort')" />
+
+                    <x-gp247::checkbox :label="gp247_language_render('Plugins/News::Category.status')" wire:model="form.status" value="1" />
                 </div>
+
+                {{-- ---- Description (per language) ---- --}}
+                <div x-show="tab === 'desc'" x-cloak class="space-y-5">
+                    <x-gp247::input :label="gp247_language_render('Plugins/News::Category.alias')" name="alias"
+                        wire:model="form.alias" :error="$errors->first('form.alias')" />
+
+                    @foreach ($this->languages() as $code => $lang)
+                        <div class="space-y-4 rounded-lg border border-gray-200 p-4 dark:border-gray-700" wire:key="cat-lang-{{ $code }}">
+                            <h3 class="flex items-center gap-2 text-sm font-semibold text-gray-700 dark:text-gray-200">
+                                @if ($lang->icon)
+                                    {!! gp247_image_render($lang->icon, '20px', '20px', $lang->name) !!}
+                                @endif
+                                {{ $lang->name }}
+                            </h3>
+                            <x-gp247::input :label="gp247_language_render('Plugins/News::Category.title')" name="title_{{ $code }}"
+                                wire:model="desc.{{ $code }}.title" :error="$errors->first('desc.' . $code . '.title')" required />
+                            <x-gp247::input :label="gp247_language_render('Plugins/News::Category.keyword')" name="keyword_{{ $code }}"
+                                wire:model="desc.{{ $code }}.keyword" :error="$errors->first('desc.' . $code . '.keyword')" />
+                            <div>
+                                <label class="{{ $labelCls }}">{!! gp247_language_render('Plugins/News::Category.description') !!}</label>
+                                <textarea wire:model="desc.{{ $code }}.description" rows="2" class="{{ $inputCls }}"></textarea>
+                                @error('desc.' . $code . '.description')<p class="mt-1 text-sm text-red-600">{{ $message }}</p>@enderror
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+
+            </x-gp247::tabs>
+
+            <div class="flex items-center justify-between border-t border-gray-200 pt-4 dark:border-gray-700">
+                <x-gp247::button variant="secondary" href="{{ gp247_route_admin('admin_news_category.index') }}" wire:navigate>{{ gp247_language_render($editingId ? 'admin.core.cancel' : 'admin.core.reset') }}</x-gp247::button>
+                <x-gp247::button type="submit" wire:loading.attr="disabled">
+                    <i class="fas fa-save"></i> {{ gp247_language_render($editingId ? 'admin.core.update' : 'admin.core.submit') }}
+                </x-gp247::button>
             </div>
-            <!-- /.card-header -->
-            <!-- form start -->
-            <form action="{{ $url_action }}" method="post" accept-charset="UTF-8" class="form-horizontal" id="form-main"
-                enctype="multipart/form-data">
+        </form>
+    </x-gp247::card>
 
-
-                <div class="card-body">
-                    @php
-                    $descriptions = $category?$category->descriptions->keyBy('lang')->toArray():[];
-                    @endphp
-
-                    @foreach ($languages as $code => $language)
-                    
-                    <div class="card">
-                        <div class="card-header with-border">
-                            <h3 class="card-title">{{ $language->name }} {!! gp247_image_render($language->icon,'20px','20px', $language->name) !!}</h3>
-                            <div class="card-tools">
-                                <button type="button" class="btn btn-tool" data-card-widget="collapse">
-                                    <i class="fas fa-minus"></i>
-                                </button>
-                                </div>
-                        </div>
-                
-                        <div class="card-body">
-
-                        <div class="form-group row  {{ $errors->has('descriptions.'.$code.'.title') ? ' text-red' : '' }}">
-                            <label for="{{ $code }}__title"
-                                class="col-sm-2 col-form-label">{{ gp247_language_render($appPath.'::Category.title') }} <span class="seo" title="SEO"><i class="fa fa-coffee" aria-hidden="true"></i></span></label>
-                            <div class="col-sm-8">
-                                <div class="input-group">
-                                    <div class="input-group-prepend">
-                                    <span class="input-group-text"><i class="fas fa-pencil-alt"></i></span>
-                                    </div>
-                                    <input type="text" id="{{ $code }}__title" name="descriptions[{{ $code }}][title]"
-                                        value="{!! old()? old('descriptions.'.$code.'.title'):($descriptions[$code]['title']??'') !!}"
-                                        class="form-control {{ $code.'__title' }}" placeholder="" />
-                                </div>
-                                @if ($errors->has('descriptions.'.$code.'.title'))
-                                <span class="form-text">
-                                    <i class="fa fa-info-circle"></i> {{ $errors->first('descriptions.'.$code.'.title') }}
-                                </span>
-                                @else
-                                    <span class="form-text">
-                                        <i class="fa fa-info-circle"></i> {{ gp247_language_render('admin.max_c',['max'=>200]) }}
-                                    </span>
-                                @endif
-                            </div>
-                        </div>
-
-                        <div
-                            class="form-group row  {{ $errors->has('descriptions.'.$code.'.keyword') ? ' text-red' : '' }}">
-                            <label for="{{ $code }}__keyword"
-                                class="col-sm-2 col-form-label">{{ gp247_language_render($appPath.'::Category.keyword') }} <span class="seo" title="SEO"><i class="fa fa-coffee" aria-hidden="true"></i></span></label>
-                            <div class="col-sm-8">
-                                <div class="input-group">
-                                    <div class="input-group-prepend">
-                                    <span class="input-group-text"><i class="fas fa-pencil-alt"></i></span>
-                                    </div>
-                                    <input type="text" id="{{ $code }}__keyword"
-                                        name="descriptions[{{ $code }}][keyword]"
-                                        value="{!! old()?old('descriptions.'.$code.'.keyword'):($descriptions[$code]['keyword']??'') !!}"
-                                        class="form-control {{ $code.'__keyword' }}" placeholder="" />
-                                </div>
-                                @if ($errors->has('descriptions.'.$code.'.keyword'))
-                                <span class="form-text">
-                                    <i class="fa fa-info-circle"></i> {{ $errors->first('descriptions.'.$code.'.keyword') }}
-                                </span>
-                                @else
-                                    <span class="form-text">
-                                        <i class="fa fa-info-circle"></i> {{ gp247_language_render('admin.max_c',['max'=>200]) }}
-                                    </span>
-                                @endif
-                            </div>
-                        </div>
-
-                        <div
-                            class="form-group row  {{ $errors->has('descriptions.'.$code.'.description') ? ' text-red' : '' }}">
-                            <label for="{{ $code }}__description"
-                                class="col-sm-2 col-form-label">{{ gp247_language_render($appPath.'::Category.description') }} <span class="seo" title="SEO"><i class="fa fa-coffee" aria-hidden="true"></i></span></label>
-                            <div class="col-sm-8">
-                                    <textarea type="text" id="{{ $code }}__description" 
-                                        name="descriptions[{{ $code }}][description]"
-                                        class="form-control {{ $code.'__description' }}" placeholder="" />{{  old()?old('descriptions.'.$code.'.description'):($descriptions[$code]['description']??'')  }}</textarea>
-                                @if ($errors->has('descriptions.'.$code.'.description'))
-                                <span class="form-text">
-                                    <i class="fa fa-info-circle"></i> {{ $errors->first('descriptions.'.$code.'.description') }}
-                                </span>
-                                @else
-                                    <span class="form-text">
-                                        <i class="fa fa-info-circle"></i> {{ gp247_language_render('admin.max_c',['max'=>300]) }}
-                                    </span>
-                                @endif
-                            </div>
-                        </div>
-                            </div>
-                        </div>
-                        @endforeach
-
-                        <div class="form-group row {{ $errors->has('parent') ? ' text-red' : '' }}">
-                            <label for="parent"
-                                class="col-sm-2 col-form-label">{{ gp247_language_render($appPath.'::Category.admin.select_parent') }}</label>
-                            <div class="col-sm-8">
-                                <select class="form-control parent select2" style="width: 100%;" name="parent">
-                                    <option value="">== ROOT ==</option>
-                                    @foreach ($categories as $k => $v)
-                                    <option value="{{ $k }}"
-                                        {{ (old('parent',$category['parent']??'') ==$k) ? 'selected':'' }}>{{ $v }}
-                                    </option>
-                                    @endforeach
-                                </select>
-                                @if ($errors->has('parent'))
-                                <span class="form-text">
-                                    <i class="fa fa-info-circle"></i> {{ $errors->first('parent') }}
-                                </span>
-                                @endif
-                            </div>
-                        </div>
-
-                        <div class="form-group row  {{ $errors->has('alias') ? ' text-red' : '' }}">
-                            <label for="alias" class="col-sm-2 col-form-label">{!! gp247_language_render($appPath.'::Category.alias') !!}</label>
-                            <div class="col-sm-8">
-                                <div class="input-group">
-                                    <div class="input-group-prepend">
-                                    <span class="input-group-text"><i class="fas fa-pencil-alt"></i></span>
-                                    </div>
-                                    <input type="text" id="alias" name="alias"
-                                        value="{!! old('alias',($category['alias']??'')) !!}" class="form-control"
-                                        placeholder="" />
-                                </div>
-                                @if ($errors->has('alias'))
-                                <span class="form-text">
-                                    <i class="fa fa-info-circle"></i> {{ $errors->first('alias') }}
-                                </span>
-                                @endif
-                            </div>
-                        </div>                        
-
-                        <div class="form-group row  {{ $errors->has('image') ? ' text-red' : '' }}">
-                            <label for="image" class="col-sm-2 col-form-label">{{ gp247_language_render($appPath.'::Category.image') }}</label>
-                            <div class="col-sm-8">
-                                <div class="input-group">
-                                    <input type="text" id="image" name="image"
-                                        value="{!! old('image',$category['image']??'') !!}"
-                                        class="form-control input image" placeholder="" />
-                                    <div class="input-group-append">
-                                        <a data-input="image" data-preview="preview_image" data-type="docs"
-                                            class="btn btn-primary lfm">
-                                            <i class="fa fa-image"></i> {{gp247_language_render('action.choose_image')}}
-                                        </a>
-                                    </div>
-                                </div>
-                                @if ($errors->has('image'))
-                                <span class="form-text">
-                                    <i class="fa fa-info-circle"></i> {{ $errors->first('image') }}
-                                </span>
-                                @endif
-                                <div id="preview_image" class="img_holder">
-                                    @if (old('image',$category['image']??''))
-                                    <img src="{{ gp247_file(old('image',$category['image']??'')) }}">
-                                    @endif
-
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="form-group row  {{ $errors->has('sort') ? ' text-red' : '' }}">
-                            <label for="sort" class="col-sm-2 col-form-label">{{ gp247_language_render($appPath.'::Category.sort') }}</label>
-                            <div class="col-sm-8">
-                                <div class="input-group">
-                                    <div class="input-group-prepend">
-                                    <span class="input-group-text"><i class="fas fa-pencil-alt"></i></span>
-                                    </div>
-                                    <input type="number" style="width: 100px;" id="sort" name="sort"
-                                        value="{!! old()?old('sort'):$category['sort']??0 !!}" class="form-control sort"
-                                        placeholder="" />
-                                </div>
-                                @if ($errors->has('sort'))
-                                <span class="form-text">
-                                    <i class="fa fa-info-circle"></i> {{ $errors->first('sort') }}
-                                </span>
-                                @endif
-                            </div>
-                        </div>
-
-
-                        <div class="form-group  row">
-                            <label for="status" class="col-sm-2 col-form-label">{{ gp247_language_render($appPath.'::Category.status') }}</label>
-                            <div class="col-sm-8">
-                                <input class="checkbox" type="checkbox" name="status"
-                                    {{ old('status',(empty($category['status'])?0:1))?'checked':''}}>
-
-                            </div>
-                        </div>
-                </div>
-
-
-
-                <!-- /.card-body -->
-
-                <div class="card-footer row" id="card-footer">
-                    @csrf
-                    <div class="col-md-2">
-                    </div>
-
-                    <div class="col-md-8">
-                        <div class="btn-group float-right">
-                            <button type="submit" class="btn btn-primary">{{ gp247_language_render('action.submit') }}</button>
-                        </div>
-
-                        <div class="btn-group float-left">
-                            <button type="reset" class="btn btn-warning">{{ gp247_language_render('action.reset') }}</button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- /.card-footer -->
-            </form>
-
+    {{-- Right: list --}}
+    <x-gp247::card :title="gp247_language_render('Plugins/News::Category.admin.list')">
+        <div class="mb-3">
+            <input type="search" wire:model.live.debounce.300ms="keyword" placeholder="{{ gp247_language_render('Plugins/News::Category.admin.search') }}"
+                class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100">
         </div>
-    </div>
+
+        <x-gp247::table :empty="$rows->isEmpty() ? gp247_language_render('admin.core.no_records') : null">
+            <x-slot:head>
+                <tr>
+                    <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">{{ gp247_language_render('Plugins/News::Category.image') }}</th>
+                    <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">{{ gp247_language_render('Plugins/News::Category.title') }}</th>
+                    <th class="cursor-pointer px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400" wire:click="setSort('sort')">
+                        {{ gp247_language_render('Plugins/News::Category.sort') }} @if ($sortField === 'sort')<span class="text-[10px]">{{ $sortDir === 'asc' ? '▲' : '▼' }}</span>@endif
+                    </th>
+                    <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">{{ gp247_language_render('Plugins/News::Category.status') }}</th>
+                    <th class="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">{{ gp247_language_render('Plugins/News::Category.admin.action') }}</th>
+                </tr>
+            </x-slot:head>
+
+            @foreach ($rows as $row)
+                <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50 {{ (string) $row->id === (string) $editingId ? 'bg-blue-50 dark:bg-blue-900/30' : '' }}" wire:key="news-category-{{ $row->id }}">
+                    <td class="px-4 py-3">
+                        @if ($row->image)<img src="{{ gp247_image_get_path_thumb($row->image) }}" alt="" class="h-9 w-auto rounded border border-gray-200 dark:border-gray-600">@else<span class="text-xs text-gray-400">—</span>@endif
+                    </td>
+                    <td class="px-4 py-3 text-sm font-medium text-gray-800 dark:text-gray-100">{{ $row->getTitle() ?: $row->alias }}</td>
+                    <td class="px-4 py-3 text-sm text-gray-600 dark:text-gray-300">{{ $row->sort }}</td>
+                    <td class="px-4 py-3"><x-gp247::badge :color="$row->status ? 'green' : 'gray'">{{ $row->status ? gp247_language_render('admin.core.active') : gp247_language_render('admin.core.inactive') }}</x-gp247::badge></td>
+                    <td class="px-4 py-3">
+                        <div class="flex items-center justify-end gap-1">
+                            <x-gp247::button size="sm" variant="ghost" href="{{ gp247_route_admin('admin_news_category.edit', $row->id) }}" wire:navigate><i class="fas fa-edit"></i></x-gp247::button>
+                            <x-gp247::button size="sm" variant="ghost" wire:click="delete('{{ $row->id }}')" wire:confirm="{{ gp247_language_render('action.delete_confirm') }}"><i class="fas fa-trash-alt text-red-600"></i></x-gp247::button>
+                        </div>
+                    </td>
+                </tr>
+            @endforeach
+        </x-gp247::table>
+
+        <div class="mt-4">{{ $rows->links('gp247-admin::partials.pagination') }}</div>
+    </x-gp247::card>
 </div>
-
-
-
-
-@endsection
-
-@push('styles')
-
-@endpush
-
-@push('scripts')
-@include('gp247-core::component.ckeditor_js')
-@endpush
