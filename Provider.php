@@ -31,4 +31,11 @@
     $configLayout['news_detail'] = gp247_language_render($extensionPath.'::News.layout_block_page.news_detail');
     config(['gp247-config.front.layout_page' => $configLayout]);
     // End add layout page for news
+
+    // Register this plugin's active categories/content into sitemap.xml
+    // (US-PLG-007, ADR seo_plugin-sitemap-extension). SeoController reads
+    // this registry — gp247/front never hardcodes the News plugin's name.
+    $sitemapProviders = config('gp247-config.front.seo_sitemap_providers', []);
+    $sitemapProviders[] = [\App\GP247\Plugins\News\Seo::class, 'sitemapUrls'];
+    config(['gp247-config.front.seo_sitemap_providers' => $sitemapProviders]);
  }
