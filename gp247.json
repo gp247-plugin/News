@@ -7,7 +7,7 @@
     "configGroup": "Plugins",
     "configCode": "Cms",
     "configKey": "News",
-    "version": "2.0.2",
+    "version": "2.0.3",
     "requireCore": ["2.0"],
     "requirePackages": ["gp247/front"],
     "requireExtensions": []
