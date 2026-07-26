@@ -236,6 +236,20 @@ class NewsCategoryManager extends ResourcePanel
     }
 
     /**
+     * Flat map of category id => title (current admin store), used by the list
+     * to resolve each row's `parent` id into a readable parent name.
+     *
+     * @return array<string, string>
+     *
+     * @aidlc-unit plugin-news
+     * @aidlc-story GP247-v2-compat
+     */
+    public function categoryTitles(): array
+    {
+        return NewsCategory::getListTitleAdmin();
+    }
+
+    /**
      * Active languages (code => language model) for the description tabs.
      *
      * @return array<string, mixed>
