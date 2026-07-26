@@ -168,7 +168,7 @@ class NewsContent extends Model
         $limit = $arrLimit['limit'] ?? 0;
 
         $data = $this->sort($sortBy, $sortOrder);
-        if(count($arrOpt = [])) {
+        if(count($arrOpt)) {
             foreach ($arrOpt as $key => $value) {
                 $data = $data->where($key, $value);
             }

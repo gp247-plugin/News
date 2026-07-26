@@ -89,7 +89,7 @@ class NewsCategory extends Model
             ->where($tableDescription . '.lang', gp247_get_locale());
 
         $data = $data->sort($sortBy, $sortOrder);
-        if(count($arrOpt = [])) {
+        if(count($arrOpt)) {
             foreach ($arrOpt as $key => $value) {
                 $data = $data->where($key, $value);
             }
