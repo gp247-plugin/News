@@ -9,8 +9,8 @@ return [
         'index' => 'Tin tức',
     ],
     'layout_block_page' => [
-        'news_index' => 'Trang chủ',
-        'news_category' => 'Danh mục',
-        'news_detail' => 'Chi tiết',
+        'news_index' => 'Danh sách tin tức',
+        'news_category' => 'Danh mục tin tức',
+        'news_detail' => 'Chi tiết tin tức',
     ],
 ];

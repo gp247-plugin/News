@@ -24,11 +24,15 @@
      view()->share('modelNewsCategory', (new \App\GP247\Plugins\News\Models\NewsCategory));
      view()->share('modelNewsContent', (new \App\GP247\Plugins\News\Models\NewsContent));
 
-    // Add layout page for news
+    // Register this plugin's storefront page-types into the LayoutBlock "Page"
+    // scope registry (US-PLG-008, ADR front-admin_layout-page-enum-catalog).
+    // WHY: store the i18n KEY, not a pre-rendered string — the admin dropdown
+    // renders it via gp247_language_render() in the viewer's current locale.
+    // Pre-rendering here froze the label at the boot locale (latent bug).
     $configLayout = config('gp247-config.front.layout_page', []);
-    $configLayout['news_index'] = gp247_language_render($extensionPath.'::News.layout_block_page.news_index')   ;
-    $configLayout['news_category'] = gp247_language_render($extensionPath.'::News.layout_block_page.news_category');
-    $configLayout['news_detail'] = gp247_language_render($extensionPath.'::News.layout_block_page.news_detail');
+    $configLayout['news_index'] = $extensionPath.'::News.layout_block_page.news_index';
+    $configLayout['news_category'] = $extensionPath.'::News.layout_block_page.news_category';
+    $configLayout['news_detail'] = $extensionPath.'::News.layout_block_page.news_detail';
     config(['gp247-config.front.layout_page' => $configLayout]);
     // End add layout page for news
 
