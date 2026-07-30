@@ -83,7 +83,10 @@ class NewsCategoryManager extends ResourcePanel
      */
     protected function defaultSort(): array
     {
-        return ['sort', 'asc'];
+        // WHY: newest-created first by default (matches the legacy
+        // NewsCategoryController list). `id` is a random UUID, not chronological,
+        // so order by the `created_at` timestamp Eloquent fills on insert.
+        return ['created_at', 'desc'];
     }
 
     /**
