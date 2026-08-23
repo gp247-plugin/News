@@ -8,7 +8,7 @@
     "configCode": "Cms",
     "configKey": "News",
     "version": "2.0.6",
-    "requireCore": ["2.0"],
-    "requirePackages": ["gp247/front"],
-    "requireExtensions": []
+    "requireCore": ["2.1"],
+    "requireComposerPackages": ["gp247/front"],
+    "requireGp247Extensions": []
 }
