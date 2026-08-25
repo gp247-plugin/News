@@ -31,6 +31,16 @@ class NewsContentManager extends ResourcePanel
     protected ?string $permission = 'admin_news_content';
 
     /**
+     * Keep list state (page/keyword/sort) and the edited record on screen when
+     * editing/saving, instead of remounting via route navigation.
+     *
+     * @var bool
+     * @aidlc-story US-AUI-two-panel-state-preservation
+     * @aidlc-adr ADR-admin-shell-rbac-two-panel-state-preservation
+     */
+    protected bool $keepStateOnSave = true;
+
+    /**
      * Comma-separated gallery image paths (matches <x-gp247::media-input>'s
      * multi-select callback, which joins picked LFM items with a comma).
      *

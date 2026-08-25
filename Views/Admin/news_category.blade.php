@@ -34,10 +34,13 @@
 
                 {{-- ---- General ---- --}}
                 <div x-show="tab === 'general'" class="space-y-4">
+                    @php($rootLabel = '== ROOT ==')
+                    @php($rootPrefix = 'ROOT')
                     <x-gp247::searchable-select
                         model="form.parent"
                         :label="gp247_language_render('Plugins/News::Category.admin.select_parent')"
-                        :options="collect(['' => '== ROOT =='] + $this->parentOptions())->reject(fn ($title, $id) => $id !== '' && (string) $id === (string) $editingId)->map(fn ($title, $id) => ['id' => (string) $id, 'label' => $title])->values()->all()"
+                        :pin-first="true"
+                        :options="collect(['' => $rootLabel] + $this->parentOptions())->reject(fn ($title, $id) => $id !== '' && (string) $id === (string) $editingId)->map(fn ($title, $id) => ['id' => (string) $id, 'label' => (string) $id === '' ? $rootLabel : $rootPrefix . ' → ' . $title])->values()->all()"
                     />
 
                     <x-gp247::media-input :label="gp247_language_render('Plugins/News::Category.image')" name="image" type="category"
@@ -78,7 +81,7 @@
             </x-gp247::tabs>
 
             <div class="flex items-center justify-between border-t border-gray-200 pt-4 dark:border-gray-700">
-                <x-gp247::button variant="secondary" href="{{ gp247_route_admin('admin_news_category.index') }}" wire:navigate>{{ gp247_language_render($editingId ? 'admin.cancel' : 'admin.reset') }}</x-gp247::button>
+                <x-gp247::button variant="secondary" wire:click="cancelEdit" data-testid="admin-news-category-form-cancel">{{ gp247_language_render($editingId ? 'admin.cancel' : 'admin.reset') }}</x-gp247::button>
                 <x-gp247::button type="submit" wire:loading.attr="disabled">
                     <i class="fas fa-save"></i> {{ gp247_language_render($editingId ? 'admin.update' : 'admin.submit') }}
                 </x-gp247::button>
@@ -108,7 +111,7 @@
             </x-slot:head>
 
             @foreach ($rows as $row)
-                <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50 {{ (string) $row->id === (string) $editingId ? 'bg-blue-50 dark:bg-blue-900/30' : '' }}" wire:key="news-category-{{ $row->id }}">
+                <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50 {{ (string) $row->id === (string) $editingId ? 'bg-blue-100 border-l-4 border-blue-500 dark:bg-blue-900 dark:border-blue-500' : '' }}" wire:key="news-category-{{ $row->id }}">
                     <td class="px-4 py-3">
                         @if ($row->image)<img src="{{ gp247_image_get_path_thumb($row->image) }}" alt="" class="h-9 w-auto rounded border border-gray-200 dark:border-gray-600">@else<span class="text-xs text-gray-400">—</span>@endif
                     </td>
@@ -118,7 +121,7 @@
                     <td class="px-4 py-3"><x-gp247::badge :color="$row->status ? 'green' : 'gray'">{{ $row->status ? gp247_language_render('admin.active') : gp247_language_render('admin.inactive') }}</x-gp247::badge></td>
                     <td class="px-4 py-3">
                         <div class="flex items-center justify-end gap-1">
-                            <x-gp247::button size="sm" variant="ghost" href="{{ gp247_route_admin('admin_news_category.edit', $row->id) }}" wire:navigate><i class="fas fa-edit"></i></x-gp247::button>
+                            <x-gp247::button size="sm" variant="ghost" wire:click="editRow('{{ $row->id }}')" data-testid="admin-news-category-list-edit"><i class="fas fa-edit"></i></x-gp247::button>
                             <x-gp247::button size="sm" variant="ghost" wire:click="delete('{{ $row->id }}')" wire:confirm="{{ gp247_language_render('action.delete_confirm') }}"><i class="fas fa-trash-alt text-red-600"></i></x-gp247::button>
                         </div>
                     </td>

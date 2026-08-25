@@ -327,28 +327,36 @@ class NewsCategory extends Model
     }
 
     /**
-     * Get tree categories
+     * Build the flat [id => label] tree of news categories for admin selects,
+     * where each label is the full ancestor breadcrumb path (e.g.
+     * "RCVN → GA → GA ADC") instead of dash indentation. The path prefix is
+     * threaded down the recursion so every level shows its complete lineage —
+     * this both matches the intended searchable-select UI and fixes the previous
+     * depth-accumulator (`$st`) which reset to '' after each recursive branch and
+     * mislabelled deep sub-trees.
      *
-     * @param   [type]  $parent      [$parent description]
-     * @param   [type]  &$tree       [&$tree description]
-     * @param   [type]  $categories  [$categories description]
-     * @param   [type]  &$st         [&$st description]
+     * @param   int|string  $parent      Parent id to expand from (0 = roots).
+     * @param   array        $tree        Accumulator, carried through recursion.
+     * @param   array|null   $categories  Pre-grouped children by parent (cached).
+     * @param   string       $prefix      Breadcrumb path of the parent branch.
+     * @return  array<int|string, string> [id => "Parent → Child → …"].
      *
-     * @return  [type]               [return description]
+     * @aidlc-unit news-plugin
+     * @aidlc-story US-SADM-002
      */
-    public function getTreeCategoriesAdmin($parent = 0, &$tree = [], $categories = null, &$st = '')
+    public function getTreeCategoriesAdmin($parent = 0, &$tree = [], $categories = null, $prefix = '')
     {
         $categories = $categories ?? $this->getListCategoryGroupByParentAdmin();
-        $categoriesTitle =  $this->getListTitleAdmin();
+        $categoriesTitle = $this->getListTitleAdmin();
         $tree = $tree ?? [];
         $lisCategory = $categories[$parent] ?? [];
         if ($lisCategory) {
             foreach ($lisCategory as $category) {
-                $tree[$category['id']] = $st . $categoriesTitle[$category['id']]??'';
+                $title = $categoriesTitle[$category['id']] ?? '';
+                $path = $prefix === '' ? $title : $prefix . ' → ' . $title;
+                $tree[$category['id']] = $path;
                 if (!empty($categories[$category['id']])) {
-                    $st .= '-- ';
-                    $this->getTreeCategoriesAdmin($category['id'], $tree, $categories, $st);
-                    $st = '';
+                    $this->getTreeCategoriesAdmin($category['id'], $tree, $categories, $path);
                 }
             }
         }
