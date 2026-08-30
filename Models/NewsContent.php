@@ -437,6 +437,7 @@ class NewsContent extends Model
         ->where($tableDescription . '.lang', gp247_get_locale())
         ->where($tableNewsCategory . '.alias', $aliasCategory)
         ->where($this->getTable() . '.status', 1)
+        ->where($this->getTable() . '.store_id', config('app.storeId'))
         ->get();
         return $content;
     }

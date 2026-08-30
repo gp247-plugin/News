@@ -6,10 +6,14 @@
 namespace App\GP247\Plugins\News;
 
 use App\GP247\Plugins\News\Models\ExtensionModel;
+use App\GP247\Plugins\News\Models\NewsCategory;
+use App\GP247\Plugins\News\Models\NewsContent;
 use GP247\Core\Models\AdminConfig;
 use GP247\Core\Models\AdminHome;
 use GP247\Core\ExtensionConfigDefault;
+use GP247\Front\Models\FrontLink;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 class AppConfig extends ExtensionConfigDefault
 {
     public function __construct()
@@ -120,18 +124,79 @@ class AppConfig extends ExtensionConfigDefault
         return $return;
     }
 
-        // Remove setup for store
-
+    /**
+     * Remove all News data belonging to the given store.
+     * Called by the platform when a store is deleted.
+     *
+     * Uses each()->delete() (not bulk delete) so Eloquent boot() cascades
+     * descriptions and images correctly.
+     * Schema::hasTable() guards against the plugin being uninstalled first.
+     *
+     * @param  mixed $storeId
+     * @return void
+     *
+     * @aidlc-unit plugin-news
+     * @aidlc-story US-news-store-remove-cleanup
+     * @aidlc-adr plugin-news_store-1to1-link-compat
+     */
     public function removeStore($storeId = null)
     {
-        // code here
+        if ($storeId === null) {
+            return;
+        }
+
+        FrontLink::where('module', $this->configKey)
+            ->where('store_id', $storeId)
+            ->delete();
+
+        $schema = Schema::connection(GP247_DB_CONNECTION);
+
+        if ($schema->hasTable(GP247_DB_PREFIX . 'news_content')) {
+            NewsContent::where('store_id', $storeId)
+                ->each(fn ($model) => $model->delete());
+        }
+
+        if ($schema->hasTable(GP247_DB_PREFIX . 'news_category')) {
+            NewsCategory::where('store_id', $storeId)
+                ->each(fn ($model) => $model->delete());
+        }
     }
 
-    // Setup for store
-
+    /**
+     * Seed the minimum News data for a newly added store.
+     * Idempotent: skipped if a FrontLink for this plugin+store already exists.
+     *
+     * @param  mixed $storeId
+     * @return void
+     *
+     * @aidlc-unit plugin-news
+     * @aidlc-story US-news-store-setup-link
+     * @aidlc-adr plugin-news_store-1to1-link-compat
+     */
     public function setupStore($storeId = null)
     {
-       // code here
+        if ($storeId === null) {
+            return;
+        }
+
+        $exists = FrontLink::where('module', $this->configKey)
+            ->where('store_id', $storeId)
+            ->exists();
+
+        if ($exists) {
+            return;
+        }
+
+        FrontLink::create([
+            'name'     => $this->appPath . '::' . $this->configKey . '.front.index',
+            'url'      => 'route_front::news.index',
+            'target'   => '_self',
+            'module'   => $this->configKey,
+            'group'    => 'menu',
+            'status'   => '1',
+            'sort'     => '20',
+            'store_id' => $storeId,
+        ]);
     }
 
     // Process when click button plugin in admin    

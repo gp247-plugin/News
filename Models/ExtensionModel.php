@@ -1,11 +1,18 @@
 <?php
+/**
+ * Extension install/uninstall orchestrator for the News plugin.
+ * Manages FrontLink (store_id 1-1, gp247/front v3.0), AdminMenu, and DB tables.
+ *
+ * @aidlc-unit plugin-news
+ * @aidlc-story US-news-store-1to1-link-compat
+ * @aidlc-adr plugin-news_store-1to1-link-compat
+ */
 #App\GP247\Plugins\News\Models\ExtensionModel.php
 namespace App\GP247\Plugins\News\Models;
 
 use Illuminate\Support\Facades\DB;
 use GP247\Core\Models\AdminMenu;
 use GP247\Front\Models\FrontLink;
-use GP247\Front\Models\FrontLinkStore;
 use App\GP247\Plugins\News\Models\NewsCategory;
 use App\GP247\Plugins\News\Models\NewsContent;
 use App\GP247\Plugins\News\Models\NewsContentDescription;
@@ -29,9 +36,9 @@ class ExtensionModel
 
     public function uninstallExtension()
     {
-        $links = FrontLink::where('module', $this->configKey)->pluck('id');
+        // WHY: gp247/front v3.0 uses store_id column directly on front_link; the
+        // FrontLinkStore pivot and its model no longer exist (c78eb0d).
         FrontLink::where('module', $this->configKey)->delete();
-        FrontLinkStore::whereIn('link_id', $links)->delete();
 
         (new NewsContent)->uninstall();
 
@@ -48,19 +55,17 @@ class ExtensionModel
 
     public function installExtension()
     {
-        $link = FrontLink::create(
-            [
-                'name' => $this->appPath.'::'. $this->configKey . '.front.index',
-                'url' => 'route_front::news.index',
-                'target' => '_self',
-                'module' => $this->configKey,
-                'group' => 'menu',
-                'status' => '1',
-                'sort' => '20',
-            ]
-        );
-        $linkId = $link->id;
-        FrontLinkStore::insert(['store_id' => GP247_STORE_ID_ROOT, 'link_id' => $linkId]);
+        // WHY: gp247/front v3.0 — store_id is a scalar column on front_link; no pivot.
+        FrontLink::create([
+            'name'     => $this->appPath . '::' . $this->configKey . '.front.index',
+            'url'      => 'route_front::news.index',
+            'target'   => '_self',
+            'module'   => $this->configKey,
+            'group'    => 'menu',
+            'status'   => '1',
+            'sort'     => '20',
+            'store_id' => GP247_STORE_ID_ROOT,
+        ]);
         
         $checkMenu = AdminMenu::where('key',$this->configKey)->first();
         if ($checkMenu) { 
