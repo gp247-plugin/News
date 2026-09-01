@@ -36,12 +36,18 @@
                 <div x-show="tab === 'general'" class="space-y-4">
                     @php($rootLabel = '== ROOT ==')
                     @php($rootPrefix = 'ROOT')
-                    <x-gp247::searchable-select
-                        model="form.parent"
-                        :label="gp247_language_render('Plugins/News::Category.admin.select_parent')"
-                        :pin-first="true"
-                        :options="collect(['' => $rootLabel] + $this->parentOptions())->reject(fn ($title, $id) => $id !== '' && (string) $id === (string) $editingId)->map(fn ($title, $id) => ['id' => (string) $id, 'label' => (string) $id === '' ? $rootLabel : $rootPrefix . ' → ' . $title])->values()->all()"
-                    />
+                    @include('gp247-admin::partials.store-scope-picker', ['testid' => 'news-category-store-select'])
+                    {{-- wire:key on $formStoreId: the searchable-select is wire:ignore'd, so
+                         changing the store must REPLACE it to reload the store-scoped parent
+                         options (ADR admin-shell_store-scoped-resource-panel). --}}
+                    <div wire:key="news-cat-parent-{{ $formStoreId }}">
+                        <x-gp247::searchable-select
+                            model="form.parent"
+                            :label="gp247_language_render('Plugins/News::Category.admin.select_parent')"
+                            :pin-first="true"
+                            :options="collect(['' => $rootLabel] + $this->parentOptions())->reject(fn ($title, $id) => $id !== '' && (string) $id === (string) $editingId)->map(fn ($title, $id) => ['id' => (string) $id, 'label' => (string) $id === '' ? $rootLabel : $rootPrefix . ' → ' . $title])->values()->all()"
+                        />
+                    </div>
 
                     <x-gp247::media-input :label="gp247_language_render('Plugins/News::Category.image')" name="image" type="category"
                         wire:model="form.image" :value="$form['image'] ?? ''" :error="$errors->first('form.image')" />
@@ -115,7 +121,10 @@
                     <td class="px-4 py-3">
                         @if ($row->image)<img src="{{ gp247_image_get_path_thumb($row->image) }}" alt="" class="h-9 w-auto rounded border border-gray-200 dark:border-gray-600">@else<span class="text-xs text-gray-400">—</span>@endif
                     </td>
-                    <td class="px-4 py-3 text-sm font-medium text-gray-800 dark:text-gray-100">{{ $row->getTitle() ?: $row->alias }}</td>
+                    <td class="px-4 py-3 text-sm font-medium text-gray-800 dark:text-gray-100">
+                        {{ $row->getTitle() ?: $row->alias }}
+                        @include('gp247-admin::partials.store-scope-line', ['storeId' => $row->store_id])
+                    </td>
                     <td class="px-4 py-3 text-sm text-gray-600 dark:text-gray-300">{{ $row->parent ? ($this->categoryTitles()[$row->parent] ?? '—') : '—' }}</td>
                     <td class="px-4 py-3 text-sm text-gray-600 dark:text-gray-300">{{ $row->sort }}</td>
                     <td class="px-4 py-3"><x-gp247::badge :color="$row->status ? 'green' : 'gray'">{{ $row->status ? gp247_language_render('admin.active') : gp247_language_render('admin.inactive') }}</x-gp247::badge></td>

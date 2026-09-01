@@ -34,12 +34,18 @@
 
                 {{-- ---- General ---- --}}
                 <div x-show="tab === 'general'" class="space-y-4">
-                    <x-gp247::searchable-select
-                        model="form.category_id"
-                        :label="gp247_language_render('Plugins/News::Content.admin.select_category')"
-                        :options="collect($this->categoryOptions())->map(fn ($title, $id) => ['id' => (string) $id, 'label' => $title])->values()->all()"
-                    />
-                    @error('form.category_id')<p class="text-sm text-red-600 dark:text-red-400">{{ $message }}</p>@enderror
+                    @include('gp247-admin::partials.store-scope-picker', ['testid' => 'news-content-store-select'])
+                    {{-- wire:key on $formStoreId: the searchable-select is wire:ignore'd, so
+                         changing the store must REPLACE it to reload the store-scoped
+                         category options (ADR admin-shell_store-scoped-resource-panel). --}}
+                    <div wire:key="news-content-category-{{ $formStoreId }}">
+                        <x-gp247::searchable-select
+                            model="form.category_id"
+                            :label="gp247_language_render('Plugins/News::Content.admin.select_category')"
+                            :options="collect($this->categoryOptions())->map(fn ($title, $id) => ['id' => (string) $id, 'label' => $title])->values()->all()"
+                        />
+                        @error('form.category_id')<p class="text-sm text-red-600 dark:text-red-400">{{ $message }}</p>@enderror
+                    </div>
 
                     <x-gp247::media-input :label="gp247_language_render('Plugins/News::Content.image')" name="image" type="content"
                         wire:model="form.image" :value="$form['image'] ?? ''" :error="$errors->first('form.image')" />
@@ -119,7 +125,10 @@
                     <td class="px-4 py-3">
                         @if ($row->image)<img src="{{ gp247_image_get_path_thumb($row->image) }}" alt="" class="h-9 w-auto rounded border border-gray-200 dark:border-gray-600">@else<span class="text-xs text-gray-400">—</span>@endif
                     </td>
-                    <td class="px-4 py-3 text-sm font-medium text-gray-800 dark:text-gray-100">{{ $row->getTitle() ?: $row->alias }}</td>
+                    <td class="px-4 py-3 text-sm font-medium text-gray-800 dark:text-gray-100">
+                        {{ $row->getTitle() ?: $row->alias }}
+                        @include('gp247-admin::partials.store-scope-line', ['storeId' => $row->store_id])
+                    </td>
                     <td class="px-4 py-3 text-sm text-gray-600 dark:text-gray-300">{{ $row->category->getTitle() ?? '—' }}</td>
                     <td class="px-4 py-3 text-sm text-gray-600 dark:text-gray-300">{{ $row->sort }}</td>
                     <td class="px-4 py-3"><x-gp247::badge :color="$row->status ? 'green' : 'gray'">{{ $row->status ? gp247_language_render('admin.active') : gp247_language_render('admin.inactive') }}</x-gp247::badge></td>

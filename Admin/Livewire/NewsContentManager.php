@@ -84,11 +84,35 @@ class NewsContentManager extends ResourcePanel
     }
 
     /**
+     * Store-scoped: pick a store on create (root admin), show it in the list, lock
+     * it on edit; changing the store on create resets the (store-scoped) category.
+     *
+     * @return array<string, mixed>|null
+     *
+     * @aidlc-unit plugin-news
+     * @aidlc-story US-SADM-store-content-assignment
+     * @aidlc-adr admin-shell_store-scoped-resource-panel
+     */
+    protected function storeScoped(): ?array
+    {
+        return ['display' => 'title', 'reset' => ['category_id']];
+    }
+
+    /**
+     * Store-scoped content query: root admin shows every store's articles (each row
+     * labelled by its store); a scoped context (store-admin/switcher) or a
+     * single-store install filters to the own store.
+     *
      * @return \Illuminate\Database\Eloquent\Builder
      */
     protected function baseQuery()
     {
-        return NewsContent::query()->where('store_id', session('adminStoreId'));
+        $query = NewsContent::query();
+        if (!($this->storeScopeActive() && $this->isRootScope())) {
+            $query->where('store_id', $this->storeContext());
+        }
+
+        return $query;
     }
 
     /**
@@ -173,6 +197,10 @@ class NewsContentManager extends ResourcePanel
         $this->fillDescriptions($model->descriptions);
         $this->galleryImages = $model->images->pluck('image')->implode(',');
 
+        // Store is immutable on edit — expose it for the read-only display + to scope
+        // the category option list to the record's own store.
+        $this->formStoreId = (string) $model->store_id;
+
         return [
             'image' => (string) $model->image,
             'alias' => (string) $model->alias,
@@ -191,7 +219,7 @@ class NewsContentManager extends ResourcePanel
 
         return [
             'form.category_id' => ['required'],
-            'form.alias' => ['required', 'string', 'max:100', Rule::unique($table, 'alias')->ignore($this->editingId)->where('store_id', session('adminStoreId'))],
+            'form.alias' => ['required', 'string', 'max:100', Rule::unique($table, 'alias')->ignore($this->editingId)->where('store_id', $this->currentStore())],
             'form.sort' => ['nullable', 'numeric', 'min:0'],
             'desc.*.title' => ['required', 'string', 'max:200'],
             'desc.*.keyword' => ['nullable', 'string', 'max:200'],
@@ -228,13 +256,20 @@ class NewsContentManager extends ResourcePanel
             'category_id' => $data['category_id'],
             'status' => empty($data['status']) ? 0 : 1,
             'sort' => (int) ($data['sort'] ?? 0),
-            'store_id' => session('adminStoreId'),
         ];
 
         if ($this->editingId !== null) {
+            // Store is immutable on edit — do NOT touch store_id (ADR 1-1).
+            $store = (string) NewsContent::whereKey($this->editingId)->value('store_id');
+            $this->assertCategorySameStore($attributes['category_id'] ?? null, $store);
             $content = NewsContent::findOrFail($this->editingId);
             $content->update($attributes);
         } else {
+            // WHY: 1-1 ownership — a new article is owned by the store picked on
+            // create (root admin) or the current scoped store (store-admin/switcher).
+            $store = $this->resolveCreateStore();
+            $this->assertCategorySameStore($attributes['category_id'] ?? null, $store);
+            $attributes['store_id'] = $store;
             $content = NewsContent::create($attributes);
         }
 
@@ -295,7 +330,48 @@ class NewsContentManager extends ResourcePanel
      */
     public function categoryOptions(): array
     {
-        return (new NewsCategory())->getTreeCategoriesAdmin();
+        if (!$this->storeScopeActive()) {
+            return (new NewsCategory())->getTreeCategoriesAdmin();
+        }
+
+        // Store-scoped: only the picked/record store's categories (none until picked).
+        $store = $this->currentStore();
+        if ($store === null || $store === '') {
+            return [];
+        }
+
+        $catTable = (new NewsCategory)->getTable();
+        $descTable = (new \App\GP247\Plugins\News\Models\NewsCategoryDescription)->getTable();
+
+        return NewsCategory::query()
+            ->where($catTable . '.store_id', $store)
+            ->join($descTable, $descTable . '.category_id', $catTable . '.id')
+            ->where($descTable . '.lang', gp247_get_locale())
+            ->pluck($descTable . '.title', $catTable . '.id')
+            ->all();
+    }
+
+    /**
+     * Reject a category that belongs to another store (same-store integrity,
+     * server-side). No-op when not store-scoped or when no category is selected.
+     *
+     * @param int|string|null $categoryId
+     * @param int|string      $storeId
+     * @return void
+     *
+     * @aidlc-adr multi-store_one-to-one-store-ownership
+     */
+    private function assertCategorySameStore($categoryId, $storeId): void
+    {
+        if (!$this->storeScopeActive() || empty($categoryId)) {
+            return;
+        }
+        $ok = NewsCategory::whereKey($categoryId)->where('store_id', $storeId)->exists();
+        if (!$ok) {
+            throw \Illuminate\Validation\ValidationException::withMessages([
+                'form.category_id' => gp247_language_render('admin.store.related_wrong_store'),
+            ]);
+        }
     }
 
     /**
