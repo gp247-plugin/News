@@ -49,7 +49,7 @@
                         />
                     </div>
 
-                    <x-gp247::media-input :label="gp247_language_render('Plugins/News::Category.image')" name="image" type="category"
+                    <x-gp247::media-input :working-store="$formStoreId ?? ''" :label="gp247_language_render('Plugins/News::Category.image')" name="image" type="category"
                         wire:model="form.image" :value="$form['image'] ?? ''" :error="$errors->first('form.image')" />
 
                     <x-gp247::input type="number" min="0" :label="gp247_language_render('Plugins/News::Category.sort')"

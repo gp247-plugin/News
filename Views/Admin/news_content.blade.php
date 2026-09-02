@@ -47,10 +47,10 @@
                         @error('form.category_id')<p class="text-sm text-red-600 dark:text-red-400">{{ $message }}</p>@enderror
                     </div>
 
-                    <x-gp247::media-input :label="gp247_language_render('Plugins/News::Content.image')" name="image" type="content"
+                    <x-gp247::media-input :working-store="$formStoreId ?? ''" :label="gp247_language_render('Plugins/News::Content.image')" name="image" type="content"
                         wire:model="form.image" :value="$form['image'] ?? ''" :error="$errors->first('form.image')" />
 
-                    <x-gp247::media-input :label="gp247_language_render('Plugins/News::Content.additional_images')" name="galleryImages" type="content"
+                    <x-gp247::media-input :working-store="$formStoreId ?? ''" :label="gp247_language_render('Plugins/News::Content.additional_images')" name="galleryImages" type="content"
                         wire:model="galleryImages" :value="$galleryImages" help="{{ gp247_language_render('Plugins/News::Content.add_more_image') }}" />
 
                     <x-gp247::input type="number" min="0" :label="gp247_language_render('Plugins/News::Content.sort')"
