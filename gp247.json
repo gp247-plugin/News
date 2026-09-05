@@ -7,7 +7,7 @@
     "configGroup": "Plugins",
     "configCode": "Content",
     "configKey": "News",
-    "version": "3.0.1",
+    "version": "3.0.2",
     "requireCore": ["3.0"],
     "requireUpdateFrom": "2.0",
     "requireComposerPackages": ["gp247/front"],
