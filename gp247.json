@@ -5,11 +5,12 @@
     "email": "support@gp247.net",
     "link": "https://GP247.net",
     "configGroup": "Plugins",
-    "configCode": "Cms",
+    "configCode": "Content",
     "configKey": "News",
     "version": "3.0.1",
     "requireCore": ["3.0"],
     "requireUpdateFrom": "2.0",
     "requireComposerPackages": ["gp247/front"],
-    "requireGp247Extensions": []
+    "requireGp247Extensions": [],
+    "storeScope": "store"
 }
