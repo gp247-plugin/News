@@ -271,6 +271,8 @@ class NewsContentManager extends ResourcePanel
             $this->assertCategorySameStore($attributes['category_id'] ?? null, $store);
             $attributes['store_id'] = $store;
             $content = NewsContent::create($attributes);
+            // ResourcePanel create contract: expose the new id so save() edits it in place.
+            $this->editingId = (string) $content->id;
         }
 
         $this->saveDescriptions($content->id);
