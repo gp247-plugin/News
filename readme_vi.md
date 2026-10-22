@@ -1,4 +1,4 @@
-**🌐 Ngôn ngữ:** **Tiếng Việt** | [English](readme.md)
+> 🌐 **Ngôn ngữ:** 🇻🇳 Tiếng Việt (hiện tại) · [🇬🇧 English](./readme.md) · [🇯🇵 日本語](./readme_ja.md)
 
 # Plugin Tin tức cho GP247
 
