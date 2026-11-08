@@ -70,7 +70,7 @@ php artisan gp247:ext-install --type=plugin --key=News
 - プラグインがすでにインストールされている場合、コマンドは実行を拒否します。新しいバージョンに上げるには `php artisan gp247:ext-update --type=plugin --key=News` を実行してください。
 - コマンドの末尾に `--json` を付けると、機械で読み取れる形式で結果を受け取れます（スクリプト／CI 用）。
 - 下記の **インストール後** の章（Enable/Disable、Config、必要に応じて `php artisan optimize:clear` を実行）はそのまま必要です。
-- 詳細：[プラグイン・テンプレートのインストールガイド](https://github.com/gp247net/gp247-docs/blob/main/extension/install-extension.md) · [コマンドリファレンス](https://github.com/gp247net/gp247-docs/blob/main/system/command-line-reference.md)。
+- 詳細：[プラグイン・テンプレートのインストールガイド](https://github.com/gp247net/gp247-docs/blob/main/extension/install-extension.md) · [コマンドリファレンス](https://github.com/gp247net/gp247-docs/blob/main/cli/cli-extensions_ja.md)。
 
 ## インストール後
 - プラグインは通常すぐに動作します。Enable/Disable と Config のオプションがある場合があります。

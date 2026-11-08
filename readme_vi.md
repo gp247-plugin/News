@@ -70,7 +70,7 @@ php artisan gp247:ext-install --type=plugin --key=News
 - Nếu plugin đã được cài, lệnh sẽ từ chối. Để lên bản mới, chạy `php artisan gp247:ext-update --type=plugin --key=News`.
 - Thêm `--json` vào cuối lệnh để nhận kết quả dạng máy đọc được (dùng cho script/CI).
 - Mục **Sau khi cài đặt** bên dưới (Enable/Disable, Config, chạy `php artisan optimize:clear` khi cần) vẫn giữ nguyên.
-- Chi tiết: [Hướng dẫn cài đặt Plugin & Template](https://github.com/gp247net/gp247-docs/blob/main/extension/install-extension_vi.md) · [Tra cứu lệnh](https://github.com/gp247net/gp247-docs/blob/main/system/command-line-reference_vi.md).
+- Chi tiết: [Hướng dẫn cài đặt Plugin & Template](https://github.com/gp247net/gp247-docs/blob/main/extension/install-extension_vi.md) · [Tra cứu lệnh](https://github.com/gp247net/gp247-docs/blob/main/cli/cli-extensions_vi.md).
 
 ## Sau khi cài đặt
 - Plugin thường hoạt động ngay; có thể có tùy chọn Enable/Disable và Config.
