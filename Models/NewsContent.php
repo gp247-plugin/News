@@ -245,12 +245,12 @@ class NewsContent extends Model
 
         DB::connection(GP247_DB_CONNECTION)->table($tableContent)->insert(
             [
-                ['id' => 1, 'alias' =>  'du-lich-trang-an', 'image' => 'https://static.gp247.net/file/s-cart/where/blog-2.jpg', 'category_id' => 1,  'sort' => 0, 'status' => '1', 'created_at' => date("Y-m-d"), 'store_id' => GP247_STORE_ID_ROOT],                    
-                ['id' => 2, 'alias' =>  'du-lich-phu-quoc', 'image' => 'https://static.gp247.net/file/s-cart/where/blog-3.jpg', 'category_id' => 1,  'sort' => 0, 'status' => '1', 'created_at' => date("Y-m-d"), 'store_id' => GP247_STORE_ID_ROOT],                    
-                ['id' => 3, 'alias' =>  'pho-ha-hoi', 'image' => 'https://static.gp247.net/file/s-cart/where/blog-4.jpg', 'category_id' => 2,  'sort' => 0, 'status' => '1', 'created_at' => date("Y-m-d"), 'store_id' => GP247_STORE_ID_ROOT],                    
-                ['id' => 4, 'alias' =>  'ca-phe-buon-me-thuot', 'image' => 'https://static.gp247.net/file/s-cart/where/blog-5.jpg', 'category_id' => 2,  'sort' => 0, 'status' => '1', 'created_at' => date("Y-m-d"), 'store_id' => GP247_STORE_ID_ROOT],                    
-                ['id' => 5, 'alias' =>  'keo-dua-ben-tre', 'image' => 'https://static.gp247.net/file/s-cart/where/blog-6.jpg', 'category_id' => 2,  'sort' => 0, 'status' => '1', 'created_at' => date("Y-m-d"), 'store_id' => GP247_STORE_ID_ROOT],                    
-                ['id' => 6, 'alias' =>  'cha-ca-nha-trang', 'image' => 'https://static.gp247.net/file/s-cart/where/blog-7.jpg', 'category_id' => 2,  'sort' => 0, 'status' => '1', 'created_at' => date("Y-m-d"), 'store_id' => GP247_STORE_ID_ROOT],                    
+                ['id' => 1, 'alias' =>  'du-lich-trang-an', 'image' => 'https://static.gp247.net/file/s-cart/news/news-1.png', 'category_id' => 1,  'sort' => 0, 'status' => '1', 'created_at' => date("Y-m-d"), 'store_id' => GP247_STORE_ID_ROOT],                    
+                ['id' => 2, 'alias' =>  'du-lich-phu-quoc', 'image' => 'https://static.gp247.net/file/s-cart/news/news-2.png', 'category_id' => 1,  'sort' => 0, 'status' => '1', 'created_at' => date("Y-m-d"), 'store_id' => GP247_STORE_ID_ROOT],                    
+                ['id' => 3, 'alias' =>  'pho-ha-hoi', 'image' => 'https://static.gp247.net/file/s-cart/news/news-3.png', 'category_id' => 2,  'sort' => 0, 'status' => '1', 'created_at' => date("Y-m-d"), 'store_id' => GP247_STORE_ID_ROOT],                    
+                ['id' => 4, 'alias' =>  'ca-phe-buon-me-thuot', 'image' => 'https://static.gp247.net/file/s-cart/news/news-4.png', 'category_id' => 2,  'sort' => 0, 'status' => '1', 'created_at' => date("Y-m-d"), 'store_id' => GP247_STORE_ID_ROOT],                    
+                ['id' => 5, 'alias' =>  'keo-dua-ben-tre', 'image' => 'https://static.gp247.net/file/s-cart/news/news-5.png', 'category_id' => 2,  'sort' => 0, 'status' => '1', 'created_at' => date("Y-m-d"), 'store_id' => GP247_STORE_ID_ROOT],                    
+                ['id' => 6, 'alias' =>  'cha-ca-nha-trang', 'image' => 'https://static.gp247.net/file/s-cart/news/news-6.png', 'category_id' => 2,  'sort' => 0, 'status' => '1', 'created_at' => date("Y-m-d"), 'store_id' => GP247_STORE_ID_ROOT],                    
             ]
         );
 
@@ -320,8 +320,8 @@ class NewsContent extends Model
 
         DB::connection(GP247_DB_CONNECTION)->table($tableCategory)->insert(
             [
-                ['id' => '1', 'alias'=> 'du-lich', 'image' => 'https://static.gp247.net/file/s-cart/where/blog-8.jpg', 'parent' => '', 'sort' => '0', 'status' => '1', 'store_id' => 1],
-                ['id' => '2', 'alias'=> 'am-thuc', 'image' => 'https://static.gp247.net/file/s-cart/where/blog-9.jpg', 'parent' => '', 'sort' => '0', 'status' => '1', 'store_id' => 1],
+                ['id' => '1', 'alias'=> 'du-lich', 'image' => 'https://static.gp247.net/file/s-cart/news/news-7.png', 'parent' => '', 'sort' => '0', 'status' => '1', 'store_id' => 1],
+                ['id' => '2', 'alias'=> 'am-thuc', 'image' => 'https://static.gp247.net/file/s-cart/news/news-8.png', 'parent' => '', 'sort' => '0', 'status' => '1', 'store_id' => 1],
             ]
         );
 
