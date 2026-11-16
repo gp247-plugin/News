@@ -153,15 +153,9 @@ class FrontController extends RootFrontController
                     )
                 );
             } else {
-                gp247_check_view('GP247TemplatePath::'.gp247_store_info('template') . '.screen.notfound');
-                return view('GP247TemplatePath::'.gp247_store_info('template') . '.screen.notfound',
-                    array(
-                        'title'       => gp247_language_render('front.notfound'),
-                        'description' => '',
-                        'keyword'     => '',
-                        'msg'         => gp247_language_render('front.notfound_detail'),
-                    )
-                );
+                // WHY itemNotFound(): it answers HTTP 404; a plain view() was a 200
+                // soft 404 (US-news-seo-correct-status, modification 20261117T055341).
+                return $this->itemNotFound();
             }
     }
 
@@ -200,21 +194,13 @@ class FrontController extends RootFrontController
             $categoryNews = $newsContent->category;
 
             if (!$categoryNews) {
-
-
-                gp247_check_view($this->GP247TemplatePath.'.screen.notfound');
-                return view($this->GP247TemplatePath.'.screen.notfound',
-                    array(
-                        'title'       => gp247_language_render('front.notfound'),
-                        'description' => '',
-                        'keyword'     => '',
-                        'msg'         => gp247_language_render('front.notfound_detail'),
-                    )
-                );
+                return $this->itemNotFound();
             }
 
+            // WHY 301: the article lives under one category; a permanent redirect
+            // hands old links' ranking to the real URL (a 302 does not).
             if ($categoryNews->alias != $category) {
-                return redirect(gp247_route_front('news.content', ['category' => $categoryNews->alias, 'alias' => $alias]));
+                return redirect(gp247_route_front('news.content', ['category' => $categoryNews->alias, 'alias' => $alias]), 301);
             }
 
             $subPath = 'news_detail';
@@ -226,7 +212,7 @@ class FrontController extends RootFrontController
                 array(
                     'title'           => $title,
                     'newsContent'     => $newsContent,
-                    'description'     => $newsContent['description'],
+                    'description'     => $this->descriptionOf($newsContent),
                     'keyword'         => $newsContent['keyword'],
                     'og_image'        => $newsContent->getImage(),
                     'layout_page'     => 'news_detail',
@@ -237,16 +223,33 @@ class FrontController extends RootFrontController
                 )
             );
         } else {
-            gp247_check_view($this->GP247TemplatePath.'.screen.notfound');
-            return view($this->GP247TemplatePath.'.screen.notfound',
-                array(
-                    'title'       => gp247_language_render('front.notfound'),
-                    'description' => '',
-                    'keyword'     => '',
-                    'msg'         => gp247_language_render('front.notfound_detail'),
-                )
-            );
+            return $this->itemNotFound();
         }
 
+    }
+
+    /**
+     * Description of an article for meta tags and JSON-LD: its own description, or
+     * — when it has none — the start of its text (tags stripped, whitespace
+     * collapsed, at most 160 characters, cut on a word boundary), so search engines
+     * never get an empty description.
+     *
+     * @param NewsContent $newsContent
+     * @return string
+     *
+     * @aidlc-unit news-plugin
+     * @aidlc-story US-news-seo-correct-status
+     */
+    private function descriptionOf(NewsContent $newsContent): string
+    {
+        $own = trim((string) $newsContent['description']);
+        if ($own !== '') {
+            return $own;
+        }
+
+        $text = html_entity_decode(strip_tags((string) $newsContent['content']), ENT_QUOTES | ENT_HTML5, 'UTF-8');
+        $text = trim((string) preg_replace('/\s+/u', ' ', $text));
+
+        return \Illuminate\Support\Str::limit($text, 160, '…', preserveWords: true);
     }
 }

@@ -31,7 +31,7 @@ $layout_page = news_detail
             'imageUrl'      => gp247_file($newsContent->getImage()),
             'datePublished' => $newsContent->created_at ? \Illuminate\Support\Carbon::parse($newsContent->created_at)->toIso8601String() : null,
             'dateModified'  => $newsContent->updated_at ? \Illuminate\Support\Carbon::parse($newsContent->updated_at)->toIso8601String() : null,
-            'description'   => $newsContent['description'],
+            'description'   => $description ?? $newsContent['description'],
         ];
         $breadcrumbItems = array_map(
             fn ($item) => ['name' => $item['title'], 'url' => $item['url'] ?: null],

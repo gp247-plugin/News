@@ -51,4 +51,16 @@
         'callback' => [\App\GP247\Plugins\News\Seo::class, 'sitemapUrls'],
     ];
     config(['gp247-config.front.seo_sitemap_providers' => $sitemapProviders]);
+
+    // SEO indexing signals (US-news-seo-correct-status, modification 20261117T055341):
+    // the list's sort parameter makes a filtered variant (noindex, follow), and an
+    // article is shared as og:type "article". A front without these registries
+    // simply ignores the keys.
+    config(['gp247-config.front.seo_noindex_query_params' => array_values(array_unique(array_merge(
+        (array) config('gp247-config.front.seo_noindex_query_params', []),
+        ['filter_sort']
+    )))]);
+    $ogTypes = (array) config('gp247-config.front.seo_og_types', []);
+    $ogTypes['news.content'] = 'article';
+    config(['gp247-config.front.seo_og_types' => $ogTypes]);
  }
