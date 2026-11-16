@@ -10,6 +10,8 @@ News management plugin for GP247 Framework with the following features:
 - Article management by categories 
 - Multi-language support for categories and articles
 - SEO friendly URLs
+- Search-engine friendly by default: a deleted article or category answers "404 Not Found", an article without a description
+  is described by the start of its text, and articles are shared as articles on social networks (requires gp247/front 3.10.1 or later)
 
 ## License
 

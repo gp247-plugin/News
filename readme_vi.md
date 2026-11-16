@@ -10,6 +10,8 @@ Plugin quản lý tin tức cho GP247 Framework với các tính năng sau:
 - Quản lý bài viết theo danh mục
 - Hỗ trợ đa ngôn ngữ cho danh mục và bài viết
 - URL thân thiện SEO
+- SEO đúng chuẩn: tin/danh mục đã xoá trả "404 — không tìm thấy", bài viết chưa có mô tả dùng đoạn đầu nội dung, chia sẻ lên
+  mạng xã hội dưới dạng bài viết (cần gp247/front 3.10.1 trở lên)
 
 ## Giấy phép
 
