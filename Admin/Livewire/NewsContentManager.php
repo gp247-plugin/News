@@ -2,8 +2,10 @@
 
 namespace App\GP247\Plugins\News\Admin\Livewire;
 
+use App\GP247\Plugins\News\Admin\Livewire\Concerns\NewsSeoPanel;
 use App\GP247\Plugins\News\Models\NewsCategory;
 use App\GP247\Plugins\News\Models\NewsContent;
+use App\GP247\Plugins\News\Seo;
 use App\GP247\Plugins\News\Models\NewsContentDescription;
 use App\GP247\Plugins\News\Models\NewsImage;
 use GP247\Core\AdminShell\Infrastructure\HasMultilingualDescriptions;
@@ -27,6 +29,7 @@ use Illuminate\Validation\Rule;
 class NewsContentManager extends ResourcePanel
 {
     use HasMultilingualDescriptions;
+    use NewsSeoPanel;
 
     protected ?string $permission = 'admin_news_content';
 
@@ -186,6 +189,7 @@ class NewsContentManager extends ResourcePanel
         parent::resetForm();
         $this->initDescriptions();
         $this->galleryImages = '';
+        $this->fillSeo(null);
     }
 
     /**
@@ -195,6 +199,7 @@ class NewsContentManager extends ResourcePanel
     protected function fillForm($model): array
     {
         $this->fillDescriptions($model->descriptions);
+        $this->fillSeo($model->id);
         $this->galleryImages = $model->images->pluck('image')->implode(',');
 
         // Store is immutable on edit — expose it for the read-only display + to scope
@@ -217,14 +222,48 @@ class NewsContentManager extends ResourcePanel
     {
         $table = (new NewsContent())->getTable();
 
-        return [
+        return array_merge([
             'form.category_id' => ['required'],
             'form.alias' => ['required', 'string', 'max:100', Rule::unique($table, 'alias')->ignore($this->editingId)->where('store_id', $this->currentStore())],
             'form.sort' => ['nullable', 'numeric', 'min:0'],
             'desc.*.title' => ['required', 'string', 'max:200'],
             'desc.*.keyword' => ['nullable', 'string', 'max:200'],
             'desc.*.description' => ['nullable', 'string', 'max:500'],
-        ];
+        ], $this->seoRules());
+    }
+
+    /**
+     * Validator labels of the SEO tab fields (empty without the front SEO layer).
+     *
+     * @return array<string, string>
+     */
+    public function validationAttributes(): array
+    {
+        return $this->seoValidationAttributes();
+    }
+
+    /**
+     * SEO content-type key of this screen (US-news-seo-panel).
+     *
+     * @return string
+     */
+    protected function seoType(): string
+    {
+        return Seo::TYPE_CONTENT;
+    }
+
+    /**
+     * Whether the SEO tab is shown: the front has the shared panel and the type is
+     * registered (neither exists on a front without the content SEO layer).
+     *
+     * @return bool
+     *
+     * @aidlc-unit news-plugin
+     * @aidlc-story US-news-seo-panel
+     */
+    public function seoPanelAvailable(): bool
+    {
+        return trait_exists(\GP247\Front\Admin\Livewire\Concerns\HasSeoPanel::class) && Seo::available($this->seoType());
     }
 
     /**
@@ -245,10 +284,21 @@ class NewsContentManager extends ResourcePanel
     }
 
     /**
+     * Save the article together with its SEO values (one transaction, US-news-seo-panel).
+     *
      * @param array<string, mixed> $data
      * @return void
      */
     protected function persist(array $data): void
+    {
+        $this->persistWithSeo(fn () => $this->persistContent($data));
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     * @return void
+     */
+    private function persistContent(array $data): void
     {
         $attributes = [
             'image' => $data['image'] ?? '',

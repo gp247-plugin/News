@@ -135,6 +135,11 @@ class NewsCategory extends Model
             //Delete category descrition
             $category->descriptions()->delete();
         });
+        // Own SEO values go with the category (US-news-seo-panel); `deleted` so a
+        // cancelled delete keeps them.
+        static::deleted(function ($category) {
+            \App\GP247\Plugins\News\Seo::forget(\App\GP247\Plugins\News\Seo::TYPE_CATEGORY, $category->id);
+        });
 
         //Uuid
         static::creating(function ($model) {

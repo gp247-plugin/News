@@ -121,6 +121,11 @@ class NewsContent extends Model
             //Delete content images
             $content->images()->delete();
         });
+        // Own SEO values go with the article (US-news-seo-panel); `deleted` so a
+        // cancelled delete keeps them.
+        static::deleted(function ($content) {
+            \App\GP247\Plugins\News\Seo::forget(\App\GP247\Plugins\News\Seo::TYPE_CONTENT, $content->id);
+        });
 
         //Uuid
         static::creating(function ($model) {
@@ -232,6 +237,10 @@ class NewsContent extends Model
 
     public function uninstall()
     {
+        // SEO values of every article/category first, while the tables still list
+        // their ids (US-news-seo-panel).
+        \App\GP247\Plugins\News\Seo::forgetAll();
+
         //Content
         $schema = Schema::connection(GP247_DB_CONNECTION);
         $tableContent = $this->getTable();

@@ -63,4 +63,16 @@
     $ogTypes = (array) config('gp247-config.front.seo_og_types', []);
     $ogTypes['news.content'] = 'article';
     config(['gp247-config.front.seo_og_types' => $ogTypes]);
+
+    // Own SEO values per article / category (US-news-seo-panel, modification
+    // 20261117T205753): the edit screens get the front's SEO tab. No 'route':
+    // the article URL also needs its category, which the front's alias-change
+    // redirect does not pass. A front without this registry ignores the key.
+    config(['gp247-config.front.seo_content_types' => array_merge(
+        (array) config('gp247-config.front.seo_content_types', []),
+        [
+            \App\GP247\Plugins\News\Seo::TYPE_CONTENT => ['label' => 'Plugins/News::lang.seo_type_news'],
+            \App\GP247\Plugins\News\Seo::TYPE_CATEGORY => ['label' => 'Plugins/News::lang.seo_type_news_category'],
+        ]
+    )]);
  }

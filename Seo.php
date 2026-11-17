@@ -19,6 +19,15 @@ use App\GP247\Plugins\News\Models\NewsContent;
  */
 class Seo
 {
+    /** SEO content type of an article (`gp247-config.front.seo_content_types`, US-news-seo-panel). */
+    public const TYPE_CONTENT = 'news';
+
+    /** SEO content type of a news category. */
+    public const TYPE_CATEGORY = 'news_category';
+
+    /** Ids handed to the front per round when clearing every news SEO value. */
+    private const FORGET_CHUNK = 500;
+
     /**
      * Active news categories and content for the given store, shaped for
      * `SeoController::collectUrls()` (`alias` is required for the shared
@@ -70,5 +79,83 @@ class Seo
         }
 
         return $entries;
+    }
+
+    /**
+     * Whether the installed gp247/front keeps per-content SEO values for `$type`.
+     * WHY: News runs on fronts without that layer too (no raised floor).
+     *
+     * @param string $type
+     * @return bool
+     *
+     * @aidlc-unit news-plugin
+     * @aidlc-story US-news-seo-panel
+     */
+    public static function available(string $type): bool
+    {
+        return class_exists(\GP247\Front\Library\SeoContentMeta::class)
+            && \GP247\Front\Library\SeoContentMeta::isRegistered($type);
+    }
+
+    /**
+     * Tell the front which news item the page shows, so its own SEO values apply.
+     *
+     * @param string     $type TYPE_CONTENT or TYPE_CATEGORY.
+     * @param int|string $id
+     * @return void
+     *
+     * @aidlc-unit news-plugin
+     * @aidlc-story US-news-seo-panel
+     */
+    public static function declareSubject(string $type, $id): void
+    {
+        if (self::available($type)) {
+            \GP247\Front\Library\SeoContentMeta::subject($type, $id);
+        }
+    }
+
+    /**
+     * Remove the SEO values of one deleted news item.
+     *
+     * @param string     $type TYPE_CONTENT or TYPE_CATEGORY.
+     * @param int|string $id
+     * @return void
+     *
+     * @aidlc-unit news-plugin
+     * @aidlc-story US-news-seo-panel
+     */
+    public static function forget(string $type, $id): void
+    {
+        if (class_exists(\GP247\Front\Library\SeoContentMeta::class)) {
+            \GP247\Front\Library\SeoContentMeta::forget($type, $id);
+        }
+    }
+
+    /**
+     * Remove the SEO values of every article and category, before the plugin drops
+     * its tables. WHY here: the front's SEO check only cleans types it knows, so rows
+     * of a removed plugin would stay forever.
+     *
+     * @return void
+     *
+     * @aidlc-unit news-plugin
+     * @aidlc-story US-news-seo-panel
+     */
+    public static function forgetAll(): void
+    {
+        if (!class_exists(\GP247\Front\Library\SeoContentMeta::class)) {
+            return;
+        }
+        $schema = \Illuminate\Support\Facades\Schema::connection(GP247_DB_CONNECTION);
+        foreach ([self::TYPE_CONTENT => new NewsContent(), self::TYPE_CATEGORY => new NewsCategory()] as $type => $model) {
+            if (!$schema->hasTable($model->getTable())) {
+                continue;
+            }
+            $model->newQuery()->select('id')->orderBy('id')->chunk(self::FORGET_CHUNK, function ($rows) use ($type) {
+                foreach ($rows as $row) {
+                    self::forget($type, $row->id);
+                }
+            });
+        }
     }
 }

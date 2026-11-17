@@ -21,15 +21,17 @@
         </x-slot:actions>
         <form wire:submit="save" class="space-y-4">
 
-            @php($tabsMap = [
+            {{-- SEO tab only when gp247/front has the shared panel (US-news-seo-panel). --}}
+            @php($tabsMap = array_filter([
                 'general' => gp247_language_render('admin.product.tab_general'),
                 'desc'    => gp247_language_render('admin.product.tab_description'),
-            ])
+                'seo'     => $this->seoPanelAvailable() ? gp247_language_render('admin.seo.panel_title') : null,
+            ]))
             {{-- Surface validation errors on hidden tabs --}}
             @php($tabsWithErrors = array_values(array_intersect(
                 array_keys($tabsMap),
                 array_unique(array_map(
-                    static fn ($k) => (str_starts_with($k, 'desc.') || $k === 'form.alias') ? 'desc' : 'general',
+                    static fn ($k) => str_starts_with($k, 'seo.') ? 'seo' : ((str_starts_with($k, 'desc.') || $k === 'form.alias') ? 'desc' : 'general'),
                     $errors->keys()
                 ))
             )))
@@ -90,6 +92,13 @@
                         </div>
                     @endforeach
                 </div>
+
+                {{-- ---- SEO (shared panel of gp247/front, US-news-seo-panel) ---- --}}
+                @if ($this->seoPanelAvailable())
+                    <div x-show="tab === 'seo'" x-cloak data-testid="admin-news-content-form-tab-seo">
+                        @include('gp247-front-admin::partials.seo-panel', ['nameField' => 'desc.{code}.title', 'descriptionField' => 'desc.{code}.description', 'aliasField' => 'form.alias', 'imageType' => 'content'])
+                    </div>
+                @endif
 
             </x-gp247::tabs>
 

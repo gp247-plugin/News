@@ -12,6 +12,9 @@ News management plugin for GP247 Framework with the following features:
 - SEO friendly URLs
 - Search-engine friendly by default: a deleted article or category answers "404 Not Found", an article without a description
   is described by the start of its text, and articles are shared as articles on social networks (requires gp247/front 3.10.1 or later)
+- SEO tab on the article and news category edit screens: the title and description shown on Google, canonical, share image, and
+  keeping each item in or out of search results (shown when gp247/front has the content SEO tab; on an older front there is no tab
+  and the plugin works as before)
 
 ## License
 

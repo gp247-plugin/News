@@ -6,6 +6,7 @@ use App\GP247\Plugins\News\AppConfig;
 use GP247\Front\Controllers\RootFrontController;
 use App\GP247\Plugins\News\Models\NewsCategory;
 use App\GP247\Plugins\News\Models\NewsContent;
+use App\GP247\Plugins\News\Seo;
 
 class FrontController extends RootFrontController
 {
@@ -138,6 +139,8 @@ class FrontController extends RootFrontController
                 $subPath = 'news_category';
                 $view = gp247_plugin_process_view($this->plugin->appPath, $this->GP247TemplatePath,$subPath);
                 gp247_check_view($view);
+                // Own SEO values of the category apply in MetaHead (US-news-seo-panel).
+                Seo::declareSubject(Seo::TYPE_CATEGORY, $newsCategory->id);
 
                 return view(
                     $view,
@@ -206,6 +209,8 @@ class FrontController extends RootFrontController
             $subPath = 'news_detail';
             $view = gp247_plugin_process_view($this->plugin->appPath, $this->GP247TemplatePath,$subPath);
             gp247_check_view($view);
+            // Own SEO values of the article apply in MetaHead (US-news-seo-panel).
+            Seo::declareSubject(Seo::TYPE_CONTENT, $newsContent->id);
 
             $title = ($newsContent) ? $newsContent->title : gp247_language_render('front.notfound');
             return view($view,
