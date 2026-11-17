@@ -18,6 +18,52 @@ class NewsContent extends Model
     use \GP247\Core\Models\UuidTrait;
     
     protected static $getListTitleAdmin = null;
+
+    /**
+     * Placeholder body of every sample article, per language.
+     */
+    private const SAMPLE_BODY = [
+        'en' => '<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.<img alt="" src="https://static.gp247.net/logo/org.jpg" style="width: 262px; height: 262px; float: right; margin: 10px;" /></p>
+                <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>',
+        'ja' => '<p>これはサンプル記事の本文です。ここに記事の内容が入ります。テキストを編集して、お店の最新情報やお知らせを掲載してください。<img alt="" src="https://static.gp247.net/logo/org.jpg" style="width: 262px; height: 262px; float: right; margin: 10px;" /></p>
+                <p>これはサンプル記事の本文です。管理画面から自由に書き換えることができます。写真や見出しを追加して、読みやすい記事に仕上げましょう。</p>',
+        'vi' => '<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.<img alt="" src="https://static.gp247.net/logo/org.jpg" style="width: 262px; height: 262px; float: right; margin: 10px;" /></p>
+                <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>',
+    ];
+
+    /**
+     * Sample articles created on install: a technology blog whose articles each show the
+     * hosted photo news-<image>.png that matches their topic.
+     *
+     * Category 1 = tech news, category 2 = tips & guides (see install()).
+     *
+     * @return array<int, array{alias: string, image: int, category: string, titles: array<string, string>}>
+     */
+    public static function sampleArticles(): array
+    {
+        return [
+            ['alias' => 'laptop-ai-the-he-moi', 'image' => 1, 'category' => '1', 'titles' => [
+                'en' => "What's new in the latest AI laptops", 'ja' => '最新AIノートPCの進化ポイント', 'vi' => 'Laptop AI thế hệ mới có gì khác?']],
+            ['alias' => 'dien-thoai-gap-hay-dien-thoai-thuong', 'image' => 3, 'category' => '1', 'titles' => [
+                'en' => 'Foldable or classic phone: which one fits you?', 'ja' => '折りたたみスマホと通常スマホ、どちらを選ぶ？', 'vi' => 'Điện thoại gập hay điện thoại thường: chọn loại nào?']],
+            ['alias' => 'dong-ho-thong-minh-theo-doi-suc-khoe', 'image' => 9, 'category' => '1', 'titles' => [
+                'en' => 'What a smartwatch can track about your health', 'ja' => 'スマートウォッチで分かる健康データ', 'vi' => 'Đồng hồ thông minh theo dõi sức khoẻ những gì?']],
+            ['alias' => 'san-uu-dai-do-cong-nghe-cuoi-nam', 'image' => 10, 'category' => '1', 'titles' => [
+                'en' => 'Year-end tech deals worth waiting for', 'ja' => '年末セールで狙いたいデジタル製品', 'vi' => 'Săn ưu đãi đồ công nghệ mùa mua sắm cuối năm']],
+            ['alias' => 'may-anh-mirrorless-cho-nguoi-moi', 'image' => 8, 'category' => '2', 'titles' => [
+                'en' => 'Mirrorless cameras for beginners', 'ja' => '初心者向けミラーレスカメラ入門', 'vi' => 'Máy ảnh mirrorless cho người mới bắt đầu']],
+            ['alias' => 'cach-chon-tai-nghe-chong-on', 'image' => 2, 'category' => '2', 'titles' => [
+                'en' => 'How to choose noise-cancelling headphones', 'ja' => 'ノイズキャンセリングヘッドホンの選び方', 'vi' => 'Cách chọn tai nghe chống ồn phù hợp']],
+            ['alias' => 'bat-dau-voi-nha-thong-minh', 'image' => 4, 'category' => '2', 'titles' => [
+                'en' => 'Getting started with a smart home', 'ja' => 'はじめてのスマートホーム', 'vi' => 'Bắt đầu với nhà thông minh từ thiết bị đơn giản']],
+            ['alias' => 'chuan-bi-goc-choi-game', 'image' => 5, 'category' => '2', 'titles' => [
+                'en' => 'Setting up your gaming corner', 'ja' => 'ゲーミング環境の整え方', 'vi' => 'Chuẩn bị góc chơi game: tay cầm, tai nghe và hơn thế']],
+            ['alias' => 'thoi-quen-bao-mat-dien-thoai', 'image' => 6, 'category' => '2', 'titles' => [
+                'en' => '5 habits that keep your phone secure', 'ja' => 'スマホを安全に使う5つの習慣', 'vi' => '5 thói quen giúp điện thoại luôn an toàn']],
+            ['alias' => 'sac-nhanh-co-hai-pin-khong', 'image' => 7, 'category' => '2', 'titles' => [
+                'en' => 'Does fast charging harm your battery?', 'ja' => '急速充電はバッテリーに悪い？', 'vi' => 'Sạc nhanh có làm hại pin không?']],
+        ];
+    }
     protected static $getListContentGroupByParentAdmin = null;
 
 
@@ -243,57 +289,17 @@ class NewsContent extends Model
             $table->primary(['content_id', 'lang']);
         });
 
-        DB::connection(GP247_DB_CONNECTION)->table($tableContent)->insert(
-            [
-                ['id' => 1, 'alias' =>  'du-lich-trang-an', 'image' => 'https://static.gp247.net/file/s-cart/news/news-1.png', 'category_id' => 1,  'sort' => 0, 'status' => '1', 'created_at' => date("Y-m-d"), 'store_id' => GP247_STORE_ID_ROOT],                    
-                ['id' => 2, 'alias' =>  'du-lich-phu-quoc', 'image' => 'https://static.gp247.net/file/s-cart/news/news-2.png', 'category_id' => 1,  'sort' => 0, 'status' => '1', 'created_at' => date("Y-m-d"), 'store_id' => GP247_STORE_ID_ROOT],                    
-                ['id' => 3, 'alias' =>  'pho-ha-hoi', 'image' => 'https://static.gp247.net/file/s-cart/news/news-3.png', 'category_id' => 2,  'sort' => 0, 'status' => '1', 'created_at' => date("Y-m-d"), 'store_id' => GP247_STORE_ID_ROOT],                    
-                ['id' => 4, 'alias' =>  'ca-phe-buon-me-thuot', 'image' => 'https://static.gp247.net/file/s-cart/news/news-4.png', 'category_id' => 2,  'sort' => 0, 'status' => '1', 'created_at' => date("Y-m-d"), 'store_id' => GP247_STORE_ID_ROOT],                    
-                ['id' => 5, 'alias' =>  'keo-dua-ben-tre', 'image' => 'https://static.gp247.net/file/s-cart/news/news-5.png', 'category_id' => 2,  'sort' => 0, 'status' => '1', 'created_at' => date("Y-m-d"), 'store_id' => GP247_STORE_ID_ROOT],                    
-                ['id' => 6, 'alias' =>  'cha-ca-nha-trang', 'image' => 'https://static.gp247.net/file/s-cart/news/news-6.png', 'category_id' => 2,  'sort' => 0, 'status' => '1', 'created_at' => date("Y-m-d"), 'store_id' => GP247_STORE_ID_ROOT],                    
-            ]
-        );
-
-        DB::connection(GP247_DB_CONNECTION)->table($tableContent.'_description')->insert(
-            [
-                ['content_id' => '1', 'lang' => 'en', 'title' => 'Du lich Trang An', 'keyword' => '', 'description' => '', 'content' => '<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.<img alt="" src="https://static.gp247.net/logo/org.jpg" style="width: 262px; height: 262px; float: right; margin: 10px;" /></p>
-                <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>'],
-                ['content_id' => '1', 'lang' => 'ja', 'title' => 'チャンアン観光', 'keyword' => '', 'description' => '', 'content' => '<p>これはサンプル記事の本文です。ここに記事の内容が入ります。テキストを編集して、お店の最新情報やお知らせを掲載してください。<img alt="" src="https://static.gp247.net/logo/org.jpg" style="width: 262px; height: 262px; float: right; margin: 10px;" /></p>
-                <p>これはサンプル記事の本文です。管理画面から自由に書き換えることができます。写真や見出しを追加して、読みやすい記事に仕上げましょう。</p>'],
-                ['content_id' => '1', 'lang' => 'vi', 'title' => 'Du lịch Tràng An', 'keyword' => '', 'description' => '', 'content' => '<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.<img alt="" src="https://static.gp247.net/logo/org.jpg" style="width: 262px; height: 262px; float: right; margin: 10px;" /></p>
-                <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>'],
-                ['content_id' => '2', 'lang' => 'en', 'title' => 'Du lich Phu Quoc', 'keyword' => '', 'description' => '', 'content' => '<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.<img alt="" src="https://static.gp247.net/logo/org.jpg" style="width: 262px; height: 262px; float: right; margin: 10px;" /></p>
-                <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>'],
-                ['content_id' => '2', 'lang' => 'ja', 'title' => 'フーコック観光', 'keyword' => '', 'description' => '', 'content' => '<p>これはサンプル記事の本文です。ここに記事の内容が入ります。テキストを編集して、お店の最新情報やお知らせを掲載してください。<img alt="" src="https://static.gp247.net/logo/org.jpg" style="width: 262px; height: 262px; float: right; margin: 10px;" /></p>
-                <p>これはサンプル記事の本文です。管理画面から自由に書き換えることができます。写真や見出しを追加して、読みやすい記事に仕上げましょう。</p>'],
-                ['content_id' => '2', 'lang' => 'vi', 'title' => 'Du lịch Phú Quốc', 'keyword' => '', 'description' => '', 'content' => '<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.<img alt="" src="https://static.gp247.net/logo/org.jpg" style="width: 262px; height: 262px; float: right; margin: 10px;" /></p>
-                <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>'],
-                ['content_id' => '3', 'lang' => 'en', 'title' => 'Pho Ha Noi', 'keyword' => '', 'description' => '', 'content' => '<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.<img alt="" src="https://static.gp247.net/logo/org.jpg" style="width: 262px; height: 262px; float: right; margin: 10px;" /></p>
-                <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>'],
-                ['content_id' => '3', 'lang' => 'ja', 'title' => 'ハノイのフォー', 'keyword' => '', 'description' => '', 'content' => '<p>これはサンプル記事の本文です。ここに記事の内容が入ります。テキストを編集して、お店の最新情報やお知らせを掲載してください。<img alt="" src="https://static.gp247.net/logo/org.jpg" style="width: 262px; height: 262px; float: right; margin: 10px;" /></p>
-                <p>これはサンプル記事の本文です。管理画面から自由に書き換えることができます。写真や見出しを追加して、読みやすい記事に仕上げましょう。</p>'],
-                ['content_id' => '3', 'lang' => 'vi', 'title' => 'Phở Hà Nội', 'keyword' => '', 'description' => '', 'content' => '<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.<img alt="" src="https://static.gp247.net/logo/org.jpg" style="width: 262px; height: 262px; float: right; margin: 10px;" /></p>
-                <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>'],
-                ['content_id' => '4', 'lang' => 'en', 'title' => 'Ca Phe Buon Me Thuot', 'keyword' => '', 'description' => '', 'content' => '<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.<img alt="" src="https://static.gp247.net/logo/org.jpg" style="width: 262px; height: 262px; float: right; margin: 10px;" /></p>
-                <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>'],
-                ['content_id' => '4', 'lang' => 'ja', 'title' => 'バンメトートのコーヒー', 'keyword' => '', 'description' => '', 'content' => '<p>これはサンプル記事の本文です。ここに記事の内容が入ります。テキストを編集して、お店の最新情報やお知らせを掲載してください。<img alt="" src="https://static.gp247.net/logo/org.jpg" style="width: 262px; height: 262px; float: right; margin: 10px;" /></p>
-                <p>これはサンプル記事の本文です。管理画面から自由に書き換えることができます。写真や見出しを追加して、読みやすい記事に仕上げましょう。</p>'],
-                ['content_id' => '4', 'lang' => 'vi', 'title' => 'Cà phê Buôn Mê Thuột', 'keyword' => '', 'description' => '', 'content' => '<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.<img alt="" src="https://static.gp247.net/logo/org.jpg" style="width: 262px; height: 262px; float: right; margin: 10px;" /></p>
-                <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>'],
-                ['content_id' => '5', 'lang' => 'en', 'title' => 'Keo Dua Ben Tre', 'keyword' => '', 'description' => '', 'content' => '<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.<img alt="" src="https://static.gp247.net/logo/org.jpg" style="width: 262px; height: 262px; float: right; margin: 10px;" /></p>
-                <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>'],
-                ['content_id' => '5', 'lang' => 'ja', 'title' => 'ベンチェーのココナッツキャンディ', 'keyword' => '', 'description' => '', 'content' => '<p>これはサンプル記事の本文です。ここに記事の内容が入ります。テキストを編集して、お店の最新情報やお知らせを掲載してください。<img alt="" src="https://static.gp247.net/logo/org.jpg" style="width: 262px; height: 262px; float: right; margin: 10px;" /></p>
-                <p>これはサンプル記事の本文です。管理画面から自由に書き換えることができます。写真や見出しを追加して、読みやすい記事に仕上げましょう。</p>'],
-                ['content_id' => '5', 'lang' => 'vi', 'title' => 'Kẹo dừa Bến Tre', 'keyword' => '', 'description' => '', 'content' => '<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.<img alt="" src="https://static.gp247.net/logo/org.jpg" style="width: 262px; height: 262px; float: right; margin: 10px;" /></p>
-                <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>'],
-                ['content_id' => '6', 'lang' => 'en', 'title' => 'Cha Ca Nha Trang', 'keyword' => '', 'description' => '', 'content' => '<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.<img alt="" src="https://static.gp247.net/logo/org.jpg" style="width: 262px; height: 262px; float: right; margin: 10px;" /></p>
-                <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>'],
-                ['content_id' => '6', 'lang' => 'ja', 'title' => 'ニャチャンのチャーカー', 'keyword' => '', 'description' => '', 'content' => '<p>これはサンプル記事の本文です。ここに記事の内容が入ります。テキストを編集して、お店の最新情報やお知らせを掲載してください。<img alt="" src="https://static.gp247.net/logo/org.jpg" style="width: 262px; height: 262px; float: right; margin: 10px;" /></p>
-                <p>これはサンプル記事の本文です。管理画面から自由に書き換えることができます。写真や見出しを追加して、読みやすい記事に仕上げましょう。</p>'],
-                ['content_id' => '6', 'lang' => 'vi', 'title' => 'Chả cá Nha Trang', 'keyword' => '', 'description' => '', 'content' => '<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.<img alt="" src="https://static.gp247.net/logo/org.jpg" style="width: 262px; height: 262px; float: right; margin: 10px;" /></p>
-                <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>'],
-            ]
-        );
+        $contentRows = [];
+        $descriptionRows = [];
+        foreach (self::sampleArticles() as $index => $article) {
+            $id = (string) ($index + 1);
+            $contentRows[] = ['id' => $id, 'alias' => $article['alias'], 'image' => 'https://static.gp247.net/file/s-cart/news/news-'.$article['image'].'.png', 'category_id' => $article['category'], 'sort' => 0, 'status' => '1', 'created_at' => date("Y-m-d"), 'store_id' => GP247_STORE_ID_ROOT];
+            foreach ($article['titles'] as $lang => $title) {
+                $descriptionRows[] = ['content_id' => $id, 'lang' => $lang, 'title' => $title, 'keyword' => '', 'description' => '', 'content' => self::SAMPLE_BODY[$lang]];
+            }
+        }
+        DB::connection(GP247_DB_CONNECTION)->table($tableContent)->insert($contentRows);
+        DB::connection(GP247_DB_CONNECTION)->table($tableContent.'_description')->insert($descriptionRows);
 
 
         //Category
@@ -320,19 +326,19 @@ class NewsContent extends Model
 
         DB::connection(GP247_DB_CONNECTION)->table($tableCategory)->insert(
             [
-                ['id' => '1', 'alias'=> 'du-lich', 'image' => 'https://static.gp247.net/file/s-cart/news/news-7.png', 'parent' => '', 'sort' => '0', 'status' => '1', 'store_id' => 1],
-                ['id' => '2', 'alias'=> 'am-thuc', 'image' => 'https://static.gp247.net/file/s-cart/news/news-8.png', 'parent' => '', 'sort' => '0', 'status' => '1', 'store_id' => 1],
+                ['id' => '1', 'alias'=> 'tin-cong-nghe', 'image' => 'https://static.gp247.net/file/s-cart/news/news-1.png', 'parent' => '', 'sort' => '0', 'status' => '1', 'store_id' => 1],
+                ['id' => '2', 'alias'=> 'meo-huong-dan', 'image' => 'https://static.gp247.net/file/s-cart/news/news-4.png', 'parent' => '', 'sort' => '0', 'status' => '1', 'store_id' => 1],
             ]
         );
 
         DB::connection(GP247_DB_CONNECTION)->table($tableCategory.'_description')->insert(
             [
-                ['category_id' => '1', 'lang' => 'en', 'title' => 'Travel', 'keyword' => '', 'description' => ''],
-                ['category_id' => '1', 'lang' => 'ja', 'title' => '旅行', 'keyword' => '', 'description' => ''],
-                ['category_id' => '1', 'lang' => 'vi', 'title' => 'Du lịch', 'keyword' => '', 'description' => ''],
-                ['category_id' => '2', 'lang' => 'en', 'title' => 'Food', 'keyword' => '', 'description' => ''],
-                ['category_id' => '2', 'lang' => 'ja', 'title' => 'グルメ', 'keyword' => '', 'description' => ''],
-                ['category_id' => '2', 'lang' => 'vi', 'title' => 'Ẩm thực', 'keyword' => '', 'description' => ''],
+                ['category_id' => '1', 'lang' => 'en', 'title' => 'Tech news', 'keyword' => '', 'description' => ''],
+                ['category_id' => '1', 'lang' => 'ja', 'title' => 'テクノロジーニュース', 'keyword' => '', 'description' => ''],
+                ['category_id' => '1', 'lang' => 'vi', 'title' => 'Tin công nghệ', 'keyword' => '', 'description' => ''],
+                ['category_id' => '2', 'lang' => 'en', 'title' => 'Tips & guides', 'keyword' => '', 'description' => ''],
+                ['category_id' => '2', 'lang' => 'ja', 'title' => '使い方・ヒント', 'keyword' => '', 'description' => ''],
+                ['category_id' => '2', 'lang' => 'vi', 'title' => 'Mẹo & hướng dẫn', 'keyword' => '', 'description' => ''],
             ]
         );
 
