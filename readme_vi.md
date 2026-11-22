@@ -1,8 +1,8 @@
 > 🌐 **Ngôn ngữ:** 🇻🇳 Tiếng Việt (hiện tại) · [🇬🇧 English](./readme.md) · [🇯🇵 日本語](./readme_ja.md)
 
-# Plugin Tin tức cho GP247
+# Plugin Tin tức cho S-Cart
 
-Plugin quản lý tin tức cho GP247 Framework với các tính năng sau:
+Plugin quản lý tin tức cho S-Cart với các tính năng sau:
 
 ## Tính năng chính
 

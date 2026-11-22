@@ -1,8 +1,8 @@
 > 🌐 **Language:** [🇻🇳 Tiếng Việt](./readme_vi.md) · 🇬🇧 English (current) · [🇯🇵 日本語](./readme_ja.md)
 
-# News Plugin for GP247
+# News Plugin for S-Cart
 
-News management plugin for GP247 Framework with the following features:
+News management plugin for S-Cart with the following features:
 
 ## Main Features
 
