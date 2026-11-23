@@ -14,6 +14,8 @@ Plugin quản lý tin tức cho S-Cart với các tính năng sau:
   mạng xã hội dưới dạng bài viết (cần gp247/front 3.10.1 trở lên)
 - Tab SEO ở màn sửa bài viết và danh mục tin: tiêu đề và mô tả hiện trên Google, canonical, ảnh chia sẻ, chặn hoặc cho phép
   lên Google cho từng bài (hiện khi gp247/front có tab SEO cho nội dung; bản front cũ hơn không có tab, plugin vẫn chạy bình thường)
+- Nhân bản bài viết: một nút tạo bản sao đang tắt (nội dung mọi ngôn ngữ, ảnh, danh mục), đường dẫn thêm `-copy`; tab SEO của bản sao
+  để trống để bản sao không mang tiêu đề / mô tả SEO của bài gốc
 
 ## Giấy phép
 

@@ -15,6 +15,8 @@ News management plugin for S-Cart with the following features:
 - SEO tab on the article and news category edit screens: the title and description shown on Google, canonical, share image, and
   keeping each item in or out of search results (shown when gp247/front has the content SEO tab; on an older front there is no tab
   and the plugin works as before)
+- Duplicate an article: one button makes a switched-off copy (texts in every language, images, category) with `-copy` added to its
+  address; the copy's SEO tab starts empty, so it never carries the original's SEO title or description
 
 ## License
 

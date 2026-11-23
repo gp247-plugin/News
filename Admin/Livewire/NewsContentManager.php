@@ -6,6 +6,7 @@ use App\GP247\Plugins\News\Admin\Livewire\Concerns\NewsSeoPanel;
 use App\GP247\Plugins\News\Models\NewsCategory;
 use App\GP247\Plugins\News\Models\NewsContent;
 use App\GP247\Plugins\News\Seo;
+use App\GP247\Plugins\News\Services\ContentDuplicator;
 use App\GP247\Plugins\News\Models\NewsContentDescription;
 use App\GP247\Plugins\News\Models\NewsImage;
 use GP247\Core\AdminShell\Infrastructure\HasMultilingualDescriptions;
@@ -373,6 +374,42 @@ class NewsContentManager extends ResourcePanel
                 gp247_cache_clear('cache_news_content');
             }
         }
+    }
+
+    /**
+     * Duplicate an article (list row or edit form) and open the copy for editing. Allowed
+     * to whoever may create articles; the original is read through baseQuery(), so a store
+     * admin only reaches articles of their own store. The stored article is duplicated, not
+     * unsaved input on the form; its content SEO is not copied.
+     *
+     * @param int|string $id Article to duplicate.
+     * @return void
+     * @throws \GP247\Core\AdminShell\Domain\AuthorizationException When the admin may not create articles.
+     *
+     * @aidlc-unit news-plugin
+     * @aidlc-story US-news-content-duplicate
+     * @aidlc-adr ADR-plugin-news-content-duplicate
+     */
+    public function duplicate($id): void
+    {
+        $this->authorizeAction('store');
+
+        // WHY baseQuery(): $id comes from the browser — a store admin must not read another store's article.
+        $source = $this->baseQuery()->find($id);
+        if ($source === null) {
+            $this->notify('error', gp247_language_render('admin.display.data_not_found'));
+
+            return;
+        }
+
+        $copy = (new ContentDuplicator)->duplicate($source);
+
+        if (function_exists('gp247_cache_clear')) {
+            gp247_cache_clear('cache_news_content');
+        }
+        $this->editRow((string) $copy->id);
+        $this->showRecordPage((string) $copy->id);
+        $this->notify('success', gp247_language_render('Plugins/News::Content.admin.duplicate_success'));
     }
 
     /**
