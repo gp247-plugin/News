@@ -77,7 +77,7 @@ php artisan gp247:ext-install --type=plugin --key=News
 - The command refuses a plugin that is already installed. To move to a newer version, run `php artisan gp247:ext-update --type=plugin --key=News`.
 - Append `--json` to get machine-readable output (for scripts/CI).
 - The **Post-Installation** section below (Enable/Disable, Config, running `php artisan optimize:clear` if needed) still applies.
-- More: [Installing Plugins & Templates](https://github.com/gp247net/gp247-docs/blob/main/extension/install-extension.md) · [Command reference](https://github.com/gp247net/gp247-docs/blob/main/cli/cli-extensions.md).
+- More: [Installing Plugins & Templates](https://github.com/gp247-official/gp247-docs/blob/main/extension/install-extension.md) · [Command reference](https://github.com/gp247-official/gp247-docs/blob/main/cli/cli-extensions.md).
 
 ## Post-Installation
 - Plugins typically work immediately; they may offer Enable/Disable and Config options.
@@ -89,5 +89,5 @@ php artisan optimize:clear
 
 ## References
 - Extension installation guide: https://gp247.net/en/docs/user-guide-extension/guide-to-installing-the-extension.html
-- GitHub (News Plugin): https://github.com/gp247net/news
+- GitHub (News Plugin): https://github.com/gp247-official/News
     
